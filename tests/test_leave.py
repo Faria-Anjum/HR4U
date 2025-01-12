@@ -1,5 +1,5 @@
 from models.landing import Dashboard
-from models.leave import LeaveRequest, AcceptRequest
+from models.leave import LeaveRequest, AcceptRequest, VerifyAccepted
 
 def test_navigateToLogin(page):
     #page.pause()
@@ -20,7 +20,9 @@ def test_requestLeave(page, today, three):
     leave.navigateToLeaveRequest()
     leave.requestNewLeave()
     leave.selectAnnualLeave()
+    leave.checkRemaining()
     leave.selectDate(today, three)
+    leave.getDuration()
     leave.confirmLeaveRequest()
 
 def test_logout(page):
@@ -37,3 +39,15 @@ def test_loginAsManager(page):
 def test_acceptRequest(page):
     response = AcceptRequest(page)
     response.navigateToAllPendingRequests()
+    response.logout()
+
+def test_verifyRemaining(page, readUpdated):
+    dash = Dashboard(page)
+    leave = VerifyAccepted(page)
+    dash.loginShortcut()
+    dash.loginUser()
+    dash.loginPass()
+    dash.clickLogIn()
+    leave.navigateToLeaveRequest()
+    leave.checkRemaining(readUpdated)
+

@@ -8,6 +8,18 @@ def page(browser):
     page = browser.new_page()
     return page
 
+@pytest.fixture
+def readUpdated():
+    with open(r"files\remaining.txt",'r') as f:
+        st = float(f.readlines()[1])
+    return str(st)
+
+@pytest.fixture
+def readRemaining():
+    with open(r"files\remaining.txt",'r') as f:
+        st = float(f.readlines()[0])
+    return str(st)
+
 #setting today's date
 @pytest.fixture(scope="session")
 def today():
