@@ -5,6 +5,7 @@ import re, time
 class IndividualPMS(Dashboard):
     def __init__(self, page):
         self.page = page
+        
 
     def navigateToPmsPlanning(self):
         expect(self.page.get_by_text("PMS (B21-F14)")).to_be_visible()
@@ -15,104 +16,79 @@ class IndividualPMS(Dashboard):
     def chooseIndividualKpi(self):
         self.page.locator("#mat-select-value-5").click()
         self.page.get_by_text("2024").click()
-        expect(self.page.get_by_role("button", name="Individual KPI * Open")).to_be_visible()
-        self.page.get_by_role("button", name="Individual KPI * Open").click()
 
-    def createKPI(self):
-        pass
-        # self.page.get_by_label("config profile").click()
-        # self.page.get_by_label("Profile Weightage *").click()
-        # self.page.get_by_label("Profile Title").click()
+    def configureCoreKPI(self, readNewKpiNameJson):
+        self.page.get_by_label("config profile").click()
+        
+        self.page.get_by_role("button", name="Add").click()
+        self.page.get_by_label("Profile Title").nth(1).click()
+        self.page.get_by_label("Profile Title").nth(1).fill(readNewKpiNameJson)
 
-        # self.page.get_by_label("config slot").click()
-        # self.page.get_by_label("Individual KPI, weightage:").click()
-        # self.page.locator(".cdk-overlay-container > div:nth-child(3)").click()
-        # self.page.get_by_role("button").nth(2).click()
-        # self.page.get_by_role("button", name="Add").click()
+        self.page.get_by_label("Profile Weightage *").first.click()
+        self.page.get_by_label("Profile Weightage *").first.fill('80')
+        self.page.get_by_label("Profile Weightage *").nth(1).click()
+        self.page.get_by_label("Profile Weightage *").nth(1).fill('20')
 
-        # for i in range(4):
+        self.page.get_by_role("button", name="Save").click()
+        expect(self.page.get_by_text("Success", exact = True)).to_be_visible()
+        self.page.get_by_role("button", name="Ok").click()
 
+    def configureSubKPI(self, slots):
 
-#     self.page.locator(".ng-tns-c128-16 > .fuse-vertical-navigation-item-wrapper > .mat-tooltip-trigger").click()
-#     self.page.get_by_role("link", name="PMS Planning").click()
-#     self.page.locator("#mat-select-value-5").click()
-#     self.page.get_by_text("2024").click()
-#     self.page.get_by_role("button", name="Individual KPI * Open").click()
-#     self.page.get_by_text("Individual KPI 1.2").click()
-#     self.page.get_by_role("button", name="Create KPI").click()
-#     self.page.get_by_label("KPI Name *").fill("Sub KPI 2")
-#     self.page.get_by_label("KPI Definition *").click()
-#     self.page.get_by_placeholder("Write Your Kpi Definition").fill("Sub KPI 2")
-#     self.page.get_by_label("L1 *").click()
-#     self.page.get_by_label("L1 *").fill("90")
-#     self.page.get_by_label("L2 *").click()
-#     self.page.get_by_label("L2 *").fill("85")
-#     self.page.get_by_label("L3 *").click()
-#     self.page.get_by_label("L3 *").fill("100")
-#     self.page.get_by_label("L4 *").click()
-#     self.page.get_by_label("L4 *").fill("80")
-#     self.page.get_by_label("L5 *").click()
-#     self.page.get_by_label("L5 *").fill("85")
-#     self.page.get_by_label("L1 Definition *").click()
-#     self.page.get_by_label("L1 Definition *").fill("L! def")
-#     self.page.get_by_label("L2 Definition *").click()
-#     self.page.get_by_label("L1 Definition *").click()
-#     self.page.get_by_label("L1 Definition *").fill("L1 def")
-#     self.page.get_by_label("L2 Definition *").click()
-#     self.page.get_by_label("L2 Definition *").fill("L2 def")
-#     self.page.get_by_label("L3 Definition *").click()
-#     self.page.get_by_label("L3 Definition *").fill("L3 def")
-#     self.page.get_by_label("L4 Definition *").click()
-#     self.page.get_by_label("L4 Definition *").fill("L4 def")
-#     self.page.get_by_label("L5 Definition *").click()
-#     self.page.get_by_label("L5 Definition *").fill("L5 def")
-#     expect(self.page.get_by_role("button", name="Save")).to_be_visible()
-#     self.page.locator("button").filter(has_text="close").click()
-#     self.page.get_by_text("PMS (B21-F14)").click()
+        self.page.get_by_label("config slot").click()
+        self.page.get_by_text("Individual KPI, weightage:").click()
+        self.page.get_by_role("option").filter(has_text="Test KPI").click()
+        for i in range(1, slots+1):
+            self.page.get_by_role("button", name="Add").click()
 
-#     self.page.get_by_role("link", name="PMS Planning").click()
-#     self.page.locator("#mat-select-value-5").click()
-#     self.page.get_by_text("2024").click()
-#     self.page.get_by_label("config profile").click()
-#     self.page.get_by_label("Profile Weightage *").click()
-#     self.page.get_by_label("Profile Title").click()
-#     self.page.locator("button").filter(has_text="close").click()
-#     self.page.get_by_label("config slot").click()
-#     self.page.get_by_label("Individual KPI, weightage:").click()
-#     self.page.locator(".cdk-overlay-container > div:nth-child(3)").click()
-#     self.page.get_by_role("button").nth(2).click()
-#     self.page.get_by_role("button", name="Add").click()
-#     self.page.get_by_label("Individual KPI 1.5 Weightage *").click()
-#     self.page.get_by_label("Individual KPI 1.5 Weightage *").fill("20")
-#     self.page.get_by_label("Individual KPI 1.1 Weightage *").click()
-#     self.page.get_by_role("button").nth(2).click()
-#     self.page.get_by_label("Individual KPI 1.1 Weightage *").click()
-#     self.page.get_by_label("Individual KPI 1.1 Weightage *").fill("25")
-#     self.page.get_by_label("Individual KPI 1.2 Weightage *").click()
-#     self.page.get_by_label("Individual KPI 1.2 Weightage *").fill("25")
-#     self.page.get_by_label("Individual KPI 1.3 Weightage *").click()
-#     self.page.get_by_label("Individual KPI 1.3 Weightage *").fill("25")
-#     self.page.get_by_label("Individual KPI 1.4 Weightage *").click()
-#     self.page.get_by_label("Individual KPI 1.4 Weightage *").fill("25")
-#     self.page.locator("button").filter(has_text="close").click()
-#     self.page.get_by_role("button", name="Individual KPI * Open").click()
-#     self.page.get_by_role("button", name="Individual KPI * Open").click()
-#     self.page.get_by_label("config slot").click()
-#     self.page.get_by_label("Individual KPI, weightage:").click()
-#     self.page.get_by_label("Individual KPI, weightage:").click()
-#     self.page.locator(".cdk-overlay-container > div:nth-child(3)").click()
-#     self.page.get_by_label("Individual KPI 1.1 Weightage *").click()
-#     self.page.get_by_label("Individual KPI 1.1 Weightage *").fill("25")
-#     self.page.get_by_label("Individual KPI 1.2 Weightage *").click()
-#     self.page.get_by_label("Individual KPI 1.2 Weightage *").fill("25")
-#     self.page.get_by_label("Individual KPI 1.3 Weightage *").click()
-#     self.page.get_by_label("Individual KPI 1.3 Weightage *").fill("25")
-#     self.page.get_by_label("Individual KPI 1.4 Weightage *").click()
-#     self.page.get_by_label("Individual KPI 1.4 Weightage *").fill("25")
-#     self.page.get_by_role("button").nth(2).click()
-#     self.page.get_by_label("KPI Slot Configuration Total").locator("div").filter(has_text="Save").click()
-#     self.page.get_by_role("button", name="Ok").click()
-#     self.page.get_by_role("button", name="Individual KPI * Open").click()
-#     self.page.get_by_text("Individual KPI 1.1").click()
-#     self.page.get_by_role("button", name="Create KPI").click()
-#     self.page.locator("button").filter(has_text="close").click()
+        self.page.get_by_label("Test KPI 2.1 Weightage *").click()
+        self.page.get_by_label("Test KPI 2.1 Weightage *").fill("33.5")
+        self.page.get_by_label("Test KPI 2.2 Weightage *").click()
+        self.page.get_by_label("Test KPI 2.2 Weightage *").fill("33.5")
+        self.page.get_by_label("Test KPI 2.3 Weightage *").click()
+        self.page.get_by_label("Test KPI 2.3 Weightage *").fill("33")
+
+        self.page.get_by_role("button", name="Save").click()
+        expect(self.page.get_by_text("Success", exact = True)).to_be_visible()
+        self.page.get_by_role("button", name="Ok").click()
+
+    def createKPI(self, readNewKpiNameJson, slots, count, increaseTestCounter):
+        kpiButton = self.page.get_by_role("button").filter(has_text=re.compile(r"Test KPI"))
+        expect(kpiButton).to_be_visible()
+        kpiButton.click()
+
+        kpino = 2
+
+        for kpi in range(1, slots+1):
+            self.page.get_by_text(f"{readNewKpiNameJson} {kpino}.{kpi}").click()
+            self.page.get_by_role("button", name="Create KPI").click()
+            self.page.get_by_label("KPI Name *").fill(f"Sub {readNewKpiNameJson} {count}_{kpi} (Automated)")
+            self.page.get_by_label("KPI Definition *").click()
+            self.page.get_by_placeholder("Write Your Kpi Definition").fill(f"Sub Test KPI {kpi}")
+
+            var = 80
+            for l in range(1,6):
+                self.page.get_by_label(f"L{l} *").click()
+                self.page.get_by_label(f"L{l} *").fill(f"{var}")
+                var+=5
+
+                self.page.get_by_label(f"L{l} Definition *").click()
+                self.page.get_by_label(f"L{l} Definition *").fill(f"L{l} def")
+
+            expect(self.page.get_by_role("button", name="Save")).to_be_visible()
+            self.page.get_by_role("button", name="Save").click()
+
+            expect(self.page.get_by_text("Success", exact = True)).to_be_visible()
+            self.page.get_by_role("button", name="Ok").click()
+
+        increaseTestCounter
+        
+    def submitKPI(self):
+        expect(self.page.get_by_role("button", name="Send to Supervisor")).to_be_visible()
+        self.page.get_by_role("button", name="Send to Supervisor").click()
+
+        expect(self.page.get_by_role("button", name="Confirm")).to_be_visible()
+        self.page.get_by_role("button", name="Confirm").click()
+        self.page.screenshot()
+
+        self.page.get_by_role("button", name="Ok").click()

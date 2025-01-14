@@ -1,22 +1,19 @@
 from models.landing import Dashboard
+from tests.test_leave import test_navigateToLogin as navigate, test_enterEmployeeCredentials as login
 from models.pms import IndividualPMS
+import time
 
-def test_navigateToLogin(page):
-    #page.pause()
-    '''User can navigate to login'''
-    dash = Dashboard(page)
-    dash.navigate()
-    
-def test_enterCredentials(page):
-    '''User can login'''
-    dash = Dashboard(page)
-    dash.loginUser()
-    dash.loginPass()
-    dash.clickLogIn()
+def test_employeeLogin(page):
+    navigate(page)
+    login(page)
 
-def test_navigateToPMS(page):
+def test_navigateToPMS(page, readNewKpiNameJson, slots, count, increaseTestCounter):
     pms = IndividualPMS(page)
-    page.pause()
+    # page.pause()
     pms.navigateToPmsPlanning()
     pms.chooseIndividualKpi()
-    pms.createKPI()
+    pms.configureCoreKPI(readNewKpiNameJson)
+    time.sleep(1)
+    pms.configureSubKPI(slots)
+    pms.createKPI(readNewKpiNameJson, slots, count, increaseTestCounter)
+    #pms.submitKPI()

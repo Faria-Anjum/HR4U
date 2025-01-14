@@ -29,9 +29,6 @@ class Dashboard(LoginPage):
     def __init__(self, page):
         self.page = page
         self.url = "https://test-pub-hris.robi.com.bd/"
-        self.email = "riyad.salehdin@robi.com.bd"
-        self.password = "Robi@12345$$"
-        self.name = "Riyad Salehdin"
     
     def checkLoggedIn(self):
         expect(self.page.locator("app-breadcrumb").get_by_text("Dashboard")).to_be_visible()

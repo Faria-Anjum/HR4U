@@ -6,8 +6,9 @@ from playwright.sync_api import expect
 import re, time
 
 class LeaveRequest(Dashboard):
-    def __init__(self, page):
+    def __init__(self, page, employeeLogin):
         self.page = page
+        self.email, self.password, self.name = employeeLogin
 
     def navigateToLeaveRequest(self):
         expect(self.page.get_by_role("link", name="Leave Request")).to_be_visible()
@@ -66,12 +67,10 @@ class LeaveRequest(Dashboard):
         self.page.get_by_role("button", name="Ok").click()
 
 class AcceptRequest(Dashboard):
-    def __init__(self, page):
+    def __init__(self, page, managerLogin):
         self.page = page
         self.url = "https://test-pub-hris.robi.com.bd/"
-        self.email = "rafat.kamal@robi.com.bd"
-        self.password = "Robi@12345$$"
-        self.name = "Mohammad Rafat Kamal"
+        self.email, self.password, self.name = managerLogin
 
     def navigateToAllPendingRequests(self):
         # self.page.get_by_text("Manager", exact=True).click()
@@ -100,6 +99,11 @@ class VerifyAccepted(LeaveRequest):
         self.page.get_by_text("More").click()
         self.page.get_by_role("menuitem", name="Leave Balance").click()
         expect(self.page.locator("#automat_leave_table")).to_contain_text("Remaining " + readUpdated)
+        self.page.get_by_role("button").click()
+
+    def withdrawRequest(self):
+        expect(self.page.get_by_role("button", name="Withdraw")).to_be_visible()
+        # expect()
     
     # page.get_by_text("More").click()
     # page.get_by_role("menuitem", name="Leave Balance").click()

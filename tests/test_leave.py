@@ -1,22 +1,24 @@
 from models.landing import Dashboard
 from models.leave import LeaveRequest, AcceptRequest, VerifyAccepted
 
+#add weekend valdation
+
 def test_navigateToLogin(page):
     #page.pause()
     '''User can navigate to login'''
     dash = Dashboard(page)
     dash.navigate()
     
-def test_enterCredentials(page):
+def test_enterEmployeeCredentials(page, employeeLogin):
     '''User can login'''
-    dash = Dashboard(page)
-    dash.loginUser()
-    dash.loginPass()
-    dash.clickLogIn()
+    login = LeaveRequest(page, employeeLogin)
+    login.loginUser()
+    login.loginPass()
+    login.clickLogIn()
     #dash.checkLoggedIn()
 
-def test_requestLeave(page, today, three):
-    leave = LeaveRequest(page)
+def test_requestLeave(page, today, three, employeeLogin):
+    leave = LeaveRequest(page, employeeLogin)
     leave.navigateToLeaveRequest()
     leave.requestNewLeave()
     leave.selectAnnualLeave()
@@ -25,29 +27,28 @@ def test_requestLeave(page, today, three):
     leave.getDuration()
     leave.confirmLeaveRequest()
 
-def test_logout(page):
-    dash = Dashboard(page)
-    dash.logout()
-    dash.loginShortcut()
+def test_logout(page, employeeLogin):
+    logout = LeaveRequest(page, employeeLogin)
+    logout.logout()
+    logout.loginShortcut()
 
-def test_loginAsManager(page):
-    response = AcceptRequest(page)
+def test_loginAsManager(page, managerLogin):
+    response = AcceptRequest(page, managerLogin)
     response.loginUser()
     response.loginPass()
     response.clickLogIn()
 
-def test_acceptRequest(page):
-    response = AcceptRequest(page)
+def test_acceptRequest(page, managerLogin):
+    response = AcceptRequest(page, managerLogin)
     response.navigateToAllPendingRequests()
     response.logout()
+    response.loginShortcut()
 
-def test_verifyRemaining(page, readUpdated):
-    dash = Dashboard(page)
+def test_verifyRemaining(page, readUpdated, employeeLogin):
     leave = VerifyAccepted(page)
-    dash.loginShortcut()
-    dash.loginUser()
-    dash.loginPass()
-    dash.clickLogIn()
+    test_enterEmployeeCredentials(page, employeeLogin)
     leave.navigateToLeaveRequest()
     leave.checkRemaining(readUpdated)
+
+    
 

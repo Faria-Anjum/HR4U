@@ -1,12 +1,62 @@
 import pytest
 from datetime import datetime, date
-import calendar
+import calendar, json
 
 #all test functions in a test file run on the same browser context
 @pytest.fixture(scope="module")
 def page(browser):
     page = browser.new_page()
     return page
+
+
+@pytest.fixture
+def employeeLogin():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['login']['employeeEmail'], json_data['login']['employeePass'], json_data['login']['employeeName']
+
+@pytest.fixture
+def managerLogin():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['login']['managerEmail'], json_data['login']['managerPass'], json_data['login']['managerName']
+
+# KPI already there in profile - Individual KPI by default
+@pytest.fixture
+def readCurrentKpiNameJson():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['current_profile']
+
+# New created KPI
+@pytest.fixture
+def readNewKpiNameJson():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['new_profile']
+
+# slots for new KPI
+@pytest.fixture
+def slots():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['slotcount']
+
+# Counter for how many times Sub KPIs have been created
+@pytest.fixture
+def count():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['testcounter']
+
+@pytest.fixture
+def increaseTestCounter():
+    with open(r"files\data.json", 'r') as f:
+        json_data = json.load(f)
+        json_data['testcounter'] += 1
+
+    with open(r"files\data.json", 'w') as f:
+        f.write(json.dumps(json_data))
 
 @pytest.fixture
 def readUpdated():
