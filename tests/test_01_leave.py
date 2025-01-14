@@ -15,7 +15,6 @@ def test_enterEmployeeCredentials(page, employeeLogin):
     login.loginUser()
     login.loginPass()
     login.clickLogIn()
-    #dash.checkLoggedIn()
 
 def test_requestLeave(page, today, three, employeeLogin):
     leave = LeaveRequest(page, employeeLogin)
@@ -41,14 +40,13 @@ def test_loginAsManager(page, managerLogin):
 def test_acceptRequest(page, managerLogin):
     response = AcceptRequest(page, managerLogin)
     response.navigateToAllPendingRequests()
+    response.findRequest()
+    response.acceptRequest()
     response.logout()
     response.loginShortcut()
 
-def test_verifyRemaining(page, readUpdated, employeeLogin):
+def test_verifyRemaining(page, readUpdatedLeave, employeeLogin):
     leave = VerifyAccepted(page)
     test_enterEmployeeCredentials(page, employeeLogin)
     leave.navigateToLeaveRequest()
-    leave.checkRemaining(readUpdated)
-
-    
-
+    leave.checkRemaining(readUpdatedLeave)

@@ -1,11 +1,13 @@
 from models.landing import Dashboard
+from models.writeToJson import increaseTestCounter as updateTestNo
 from playwright.sync_api import expect
 import re, time
+
+#core and sub kpi configuration hardcoded, dynamic needs work
 
 class IndividualPMS(Dashboard):
     def __init__(self, page):
         self.page = page
-        
 
     def navigateToPmsPlanning(self):
         expect(self.page.get_by_text("PMS (B21-F14)")).to_be_visible()
@@ -13,12 +15,13 @@ class IndividualPMS(Dashboard):
         expect(self.page.get_by_role("link", name="PMS Planning")).to_be_visible()
         self.page.get_by_role("link", name="PMS Planning").click()
 
-    def chooseIndividualKpi(self):
+    def chooseYear(self):
+        # choose 2024 for PMS
         self.page.locator("#mat-select-value-5").click()
         self.page.get_by_text("2024").click()
 
     def configureCoreKPI(self, readNewKpiNameJson):
-        self.page.get_by_label("config profile").click()
+        self.page.get_by_label("config profile").click() #config core kpi
         
         self.page.get_by_role("button", name="Add").click()
         self.page.get_by_label("Profile Title").nth(1).click()
@@ -52,8 +55,8 @@ class IndividualPMS(Dashboard):
         expect(self.page.get_by_text("Success", exact = True)).to_be_visible()
         self.page.get_by_role("button", name="Ok").click()
 
-    def createKPI(self, readNewKpiNameJson, slots, count, increaseTestCounter):
-        kpiButton = self.page.get_by_role("button").filter(has_text=re.compile(r"Test KPI"))
+    def createKPI(self, readNewKpiNameJson, slots, count):
+        kpiButton = self.page.get_by_role("button").filter(has_text=re.compile(fr"{readNewKpiNameJson}"))
         expect(kpiButton).to_be_visible()
         kpiButton.click()
 
@@ -64,7 +67,7 @@ class IndividualPMS(Dashboard):
             self.page.get_by_role("button", name="Create KPI").click()
             self.page.get_by_label("KPI Name *").fill(f"Sub {readNewKpiNameJson} {count}_{kpi} (Automated)")
             self.page.get_by_label("KPI Definition *").click()
-            self.page.get_by_placeholder("Write Your Kpi Definition").fill(f"Sub Test KPI {kpi}")
+            self.page.get_by_placeholder("Write Your Kpi Definition").fill(f"Sub {readNewKpiNameJson} {kpi}")
 
             var = 80
             for l in range(1,6):
@@ -81,7 +84,7 @@ class IndividualPMS(Dashboard):
             expect(self.page.get_by_text("Success", exact = True)).to_be_visible()
             self.page.get_by_role("button", name="Ok").click()
 
-        increaseTestCounter
+        updateTestNo()
         
     def submitKPI(self):
         expect(self.page.get_by_role("button", name="Send to Supervisor")).to_be_visible()

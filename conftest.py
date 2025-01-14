@@ -8,7 +8,6 @@ def page(browser):
     page = browser.new_page()
     return page
 
-
 @pytest.fixture
 def employeeLogin():
     with open(r"files\data.json",'r') as f:
@@ -26,49 +25,49 @@ def managerLogin():
 def readCurrentKpiNameJson():
     with open(r"files\data.json",'r') as f:
         json_data = json.load(f)
-    return json_data['current_profile']
+    return json_data['kpi']['current_profile']
 
 # New created KPI
 @pytest.fixture
 def readNewKpiNameJson():
     with open(r"files\data.json",'r') as f:
         json_data = json.load(f)
-    return json_data['new_profile']
+    return json_data['kpi']['new_profile']
 
 # slots for new KPI
 @pytest.fixture
 def slots():
     with open(r"files\data.json",'r') as f:
         json_data = json.load(f)
-    return json_data['slotcount']
+    return json_data['kpi']['slotcount']
 
 # Counter for how many times Sub KPIs have been created
 @pytest.fixture
 def count():
     with open(r"files\data.json",'r') as f:
         json_data = json.load(f)
-    return json_data['testcounter']
+    return json_data['kpi']['testcounter']
+
+# @pytest.fixture
+# def increaseTestCounter():
+#     with open(r"files\data.json", 'r') as f:
+#         json_data = json.load(f)
+#         json_data['testcounter'] += 1
+
+#     with open(r"files\data.json", 'w') as f:
+#         f.write(json.dumps(json_data))
 
 @pytest.fixture
-def increaseTestCounter():
-    with open(r"files\data.json", 'r') as f:
+def readRemainingLeave():
+    with open(r"files\data.json",'r') as f:
         json_data = json.load(f)
-        json_data['testcounter'] += 1
-
-    with open(r"files\data.json", 'w') as f:
-        f.write(json.dumps(json_data))
+    return json_data['leave']['remainingLeave']
 
 @pytest.fixture
-def readUpdated():
-    with open(r"files\remaining.txt",'r') as f:
-        st = float(f.readlines()[1])
-    return str(st)
-
-@pytest.fixture
-def readRemaining():
-    with open(r"files\remaining.txt",'r') as f:
-        st = float(f.readlines()[0])
-    return str(st)
+def readUpdatedLeave():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['leave']['updatedLeave']
 
 #setting today's date
 @pytest.fixture(scope="session")

@@ -45,6 +45,14 @@ class Dashboard(LoginPage):
     def loginShortcut(self):
         self.page.get_by_role("link", name="sign in").click()
 
+    def clickConfirm(self):
+        expect(self.page.get_by_text("Confirm action")).to_be_visible()
+        self.page.get_by_role("button", name="Confirm").click()
+
+    def confirmSuccessPopup(self):
+        expect(self.page.get_by_text("Success", exact = True)).to_be_visible()
+        self.page.get_by_role("button", name="Ok").click()
+
 
 #     page.locator("app-breadcrumb").get_by_text("Dashboard").click()
 #     page.locator("user").get_by_text("Riyad Salehdin").click()

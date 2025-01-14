@@ -2,6 +2,7 @@
 # add weekend check for automatic leave date selection
 
 from models.landing import Dashboard
+from models.writeToJson import writeRemainingLeave, writeLeaveDuration, updateRemainingLeave
 from playwright.sync_api import expect
 import re, time
 
@@ -28,11 +29,7 @@ class LeaveRequest(Dashboard):
         def getRemaining(text):
             text = re.search('You have (.*?) days', text)
             rem = text.group(1)
-
-            def writeRemaining(rem):
-                with open(r"files\remaining.txt",'w') as f:
-                    f.write(rem)
-            writeRemaining(rem)
+            writeRemainingLeave(float(rem))
 
         rem = self.page.locator("#automat_leave_form div").get_by_text("You have").inner_text()
         getRemaining(rem)
@@ -47,24 +44,16 @@ class LeaveRequest(Dashboard):
     def getDuration(self):
         time.sleep(0.25)
         duration = self.page.eval_on_selector('#automat_duration_input', 'element => element.value')
-
-        def writeRemaining(rem):
-                with open(r"files\remaining.txt",'r') as f:
-                    curr = float(f.read())
-                newrem = curr - float(rem)
-                print(rem, newrem)
-                if str(newrem)[-1] == '0':
-                    newrem = int(newrem)
-                with open(r"files\remaining.txt",'w') as f:
-                    f.write(str(curr) +'\n'+str(newrem))
-        writeRemaining(duration)
+        writeLeaveDuration(float(duration))
+        updateRemainingLeave()
 
     def confirmLeaveRequest(self):
         self.page.get_by_label("Leave Reason *").click()
         self.page.get_by_placeholder("Reason (Max limit: 190").fill("Test Leave")
 
         self.page.get_by_role("button", name="Request Now").click()
-        self.page.get_by_role("button", name="Ok").click()
+        self.confirmSuccessPopup()
+
 
 class AcceptRequest(Dashboard):
     def __init__(self, page, managerLogin):
@@ -73,48 +62,43 @@ class AcceptRequest(Dashboard):
         self.email, self.password, self.name = managerLogin
 
     def navigateToAllPendingRequests(self):
+        # uncomment if logging in to manager defaults to employee dashboard
         # self.page.get_by_text("Manager", exact=True).click()
         # self.page.get_by_text("Manager Dashboard", exact=True).click()
+        # expect(self.page.get_by_text("Pending Leave History", exact=True)).to_be_visible()
 
-        #expect(self.page.get_by_heading("Pending Leave History")).to_be_visible()
+        # open all requests
         self.page.get_by_text("View Details").click()
-
         expect(self.page.get_by_text("All Pending Requests")).to_be_visible()
-        row = self.page.locator("tr:first-child")
-        cell = row.locator("td:nth-child(10)")
-        # expect(cell).to_contain_text("Accept")
-        # expect(cell).to_contain_text("Reject")
 
+    def findRequest(self):
+        # finding accept and reject buttons for top request
+        row = self.page.locator("tr:first-child")
+        global cell
+        cell = row.locator("td:nth-child(10)")
+
+    def acceptRequest(self):
+        # accepting request
         cell.get_by_role("button", name="Accept").click()
-        expect(self.page.get_by_text("Confirm action")).to_be_visible()
-        self.page.get_by_role("button", name="Confirm").click()
-        expect(self.page.get_by_text("Success", exact = True)).to_be_visible()
-        self.page.get_by_role("button", name="Ok").click()
+        self.clickConfirm()
+        self.confirmSuccessPopup()
 
 class VerifyAccepted(LeaveRequest):
     def __init__(self, page):
         self.page = page
 
-    def checkRemaining(self, readUpdated):
+    def checkRemaining(self, readUpdatedLeave):
+        # ensure accepted leave has been deducted
         self.page.get_by_text("More").click()
         self.page.get_by_role("menuitem", name="Leave Balance").click()
-        expect(self.page.locator("#automat_leave_table")).to_contain_text("Remaining " + readUpdated)
+        expect(self.page.locator("#automat_leave_table")).to_contain_text("Remaining " + str(readUpdatedLeave))
         self.page.get_by_role("button").click()
+
+class Withdraw(LeaveRequest):
+    def __init__(self, page):
+        self.page = page
 
     def withdrawRequest(self):
         expect(self.page.get_by_role("button", name="Withdraw")).to_be_visible()
-        # expect()
-    
-    # page.get_by_text("More").click()
-    # page.get_by_role("menuitem", name="Leave Balance").click()
-    # page.get_by_text("41").click()
-    # page.get_by_text("38.5").click()
-    # page.get_by_text("Remaining 38.5").click()
-    # page.get_by_text("38.5").click()
-    # page.get_by_text("Annual Leave Entitled 41").click(button="right")
-    # page.get_by_role("button").click()
-    # page.get_by_role("button", name="New Leave Request").click()
-    # page.get_by_text("*You have 38.5 days of annual").click()
-    # page.get_by_text("out of 41 days").click()
-    # page.get_by_placeholder("Duration").click()
-    # page.locator("button").filter(has_text="close").click()
+        self.page.get_by_role("button", name="Withdraw").click()
+        self.clickConfirm()
