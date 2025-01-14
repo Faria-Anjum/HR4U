@@ -17,11 +17,14 @@
 + Accepting leave withdrawal through manager
 
 ## Setup
-#### In a command prompt, navigate to the root folder and run this command:
+#### In a terminal, navigate to the root folder and enter this command to install all requirements:
 ```
 pip install -r requirements.txt
 ```
-#### Run the command ```pytest``` to run the test files
+#### Enter this command to run the test files:
+```
+pytest
+```
 
 ## Directory
 
