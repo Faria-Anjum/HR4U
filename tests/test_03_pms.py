@@ -7,17 +7,17 @@ def test_employeeLogin(page, employeeLogin):
     navigate(page)
     loginemployee(page, employeeLogin)
 
-# def test_navigateToPMS(page, kpiYear, readCurrentKpiNameJson):
-#     pms = IndividualPMS(page, readCurrentKpiNameJson)
-#     #page.pause()
-#     pms.navigateToPmsPlanning()
-#     pms.chooseYear(kpiYear)
+def test_navigateToPMS(page, kpiYear, readCurrentKpiNameJson):
+    pms = IndividualPMS(page, readCurrentKpiNameJson)
+    #page.pause()
+    pms.navigateToPmsPlanning()
+    pms.chooseYear(kpiYear)
 
-# def test_fillupSlotsKPI(page, readCurrentKpiNameJson, kpiYear, readAddSlots, readDeleteSlots, readSlotCount, count):
-#     pms = IndividualPMS(page, readCurrentKpiNameJson)
-#     pms.configureKPISlots(kpiYear, readAddSlots, readDeleteSlots)
-#     pms.fillupSubKPIs(count, readSlotCount, kpiYear)
-#     pms.submitKPI()
+def test_fillupSlotsKPI(page, readCurrentKpiNameJson, kpiYear, readAddSlots, readDeleteSlots, readSlotCount, count):
+    pms = IndividualPMS(page, readCurrentKpiNameJson)
+    pms.configureKPISlots(kpiYear, readAddSlots, readDeleteSlots)
+    pms.fillupSubKPIs(count, readSlotCount, kpiYear)
+    pms.submitKPI()
 
 def test_revertKPI(page, employeeLogin, managerLogin, readEmployeeName):
     logout(page, employeeLogin)
