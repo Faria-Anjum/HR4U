@@ -7,6 +7,46 @@ def page(browser):
     page = browser.new_page()
     return page
 
+#setting certificate effective date
+def effectiveDate():
+    today = datetime.now()
+
+    month = calendar.month_name[today.month]
+    day = today.day
+
+    day = f'{day} {month}'
+    return day
+
+def monthlogic(today, month):
+    if month == 0:
+        month = 12
+    if month < today.month:
+        year = today.year + 1
+    else:
+        year = today.year
+
+    return month, year
+
+def expDate():
+    today = datetime.now()
+
+    month = (today.month + 3)%12
+    month, year = monthlogic(today, month)
+
+    if today.day in [28,29,30,31]:
+        day = 1
+        month = (month + 1)%12
+        monthlogic(month, year)
+    else:
+        day = today.day
+
+    month = calendar.month_name[month]
+
+    # day = f'{day} {month} {year}'
+    return str(day), str(month), str(year)
+
+
+
 @pytest.fixture
 def employeeLogin():
     with open(r"files\data.json",'r') as f:
@@ -25,6 +65,24 @@ def managerLogin():
         json_data = json.load(f)
     return json_data['login']['managerEmail'], json_data['login']['managerPass'], json_data['login']['managerName']
 
+
+
+@pytest.fixture
+def readCertificateInfo():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    name = json_data['profile']['trainingName'] + str(json_data['profile']['testCount'])
+    expDay, expMonth, expYear = expDate()
+    return name, json_data['profile']['trainingInstitution'], effectiveDate(), expDay, expMonth, expYear, json_data['profile']['trainingSkills']
+
+@pytest.fixture
+def readTrainingUrl():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['profile']['trainingUrl']
+
+
+
 @pytest.fixture
 def readRemainingLeave():
     with open(r"files\data.json",'r') as f:
@@ -36,6 +94,8 @@ def readUpdatedLeave():
     with open(r"files\data.json",'r') as f:
         json_data = json.load(f)
     return json_data['leave']['updatedLeave']
+
+
 
 @pytest.fixture
 def readSlotCount():
@@ -99,6 +159,8 @@ def count():
         json_data = json.load(f)
     return json_data['pms']['testcounter']
 
+
+
 #getting current year
 @pytest.fixture(scope="session")
 def currentYear():
@@ -113,7 +175,7 @@ def today():
 
     year = today.year
     month = calendar.month_name[today.month]
-    day = today.day + 1
+    day = today.day
 
     day = f'{day} {month} {year}'
     return day
@@ -129,7 +191,6 @@ def three():
 
     day = f'{day} {month} {year}'
     return day
-
 
 #setting tomorrow's date
 @pytest.fixture(scope="session")
@@ -157,6 +218,8 @@ def tomorrow():
     day = f'{year}-{month}-{day}'
     return day
     
+
+
 #customizing html report
 def pytest_html_results_table_header(cells):
     cells.insert(2, "<th>Description</th>")

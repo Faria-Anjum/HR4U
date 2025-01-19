@@ -1,5 +1,14 @@
 import json, math
 
+def writeTrainingTestCounter():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+        json_data['profile']['testCount'] += 1
+
+    with open(r"files\data.json", 'w') as f:
+        f.write(json.dumps(json_data))
+        
+
 def writeRemainingLeave(rem):
     with open(r"files\data.json",'r') as f:
         json_data = json.load(f)
@@ -29,6 +38,8 @@ def updateRemainingLeave():
 
     with open(r"files\data.json", 'w') as f:
         f.write(json.dumps(json_data))
+
+
 
 def writeTotalSlots(total):
     with open(r"files\data.json",'r') as f:
