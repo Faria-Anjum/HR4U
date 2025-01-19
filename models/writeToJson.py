@@ -46,6 +46,14 @@ def writeAddSlots(num):
     with open(r"files\data.json", 'w') as f:
         f.write(json.dumps(json_data))
 
+def writeDeleteSlots(num):
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+        json_data['pms']['delete_slots']+=num
+
+    with open(r"files\data.json", 'w') as f:
+        f.write(json.dumps(json_data))
+
 def calculatePercentage():
     with open(r"files\data.json",'r') as f:
         json_data = json.load(f)
@@ -62,3 +70,18 @@ def increaseTestCounter():
 
     with open(r"files\data.json", 'w') as f:
         f.write(json.dumps(json_data))
+
+def readSlotCount():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['pms']['totalSlots']
+
+def readAddSlots():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['pms']['add_slots']
+
+def readDeleteSlots():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['pms']['delete_slots']

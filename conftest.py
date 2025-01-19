@@ -38,12 +38,6 @@ def readUpdatedLeave():
     return json_data['leave']['updatedLeave']
 
 @pytest.fixture
-def readInitSlotCount():
-    with open(r"files\data.json",'r') as f:
-        json_data = json.load(f)
-    return json_data['pms']['init_slots']
-
-@pytest.fixture
 def readSlotCount():
     with open(r"files\data.json",'r') as f:
         json_data = json.load(f)
@@ -104,6 +98,13 @@ def count():
     with open(r"files\data.json",'r') as f:
         json_data = json.load(f)
     return json_data['pms']['testcounter']
+
+#getting current year
+@pytest.fixture(scope="session")
+def currentYear():
+    today = datetime.now()
+    year = today.year
+    return year
 
 #setting today's date
 @pytest.fixture(scope="session")

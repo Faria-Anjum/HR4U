@@ -1,14 +1,16 @@
 from models.landing import Dashboard
-from models.writeToJson import writeTotalSlots, writeAddSlots, calculatePercentage, increaseTestCounter as updateTestNo
+from models.writeToJson import writeTotalSlots, writeAddSlots, writeDeleteSlots, calculatePercentage, increaseTestCounter as updateTestNo
+# from models.writeToJson import readAddSlots, readDeleteSlots, readSlotCount
 from playwright.sync_api import expect
 import re, time
 
 #core and sub kpi configuration hardcoded, dynamic needs work
 
 class IndividualPMS(Dashboard):
-    def __init__(self, page, readCurrentKpiNameJson):
+    def __init__(self, page, readCurrentKpiNameJson, kpiYear):
         self.page = page
         self.kpiname = readCurrentKpiNameJson
+        self.kpiYear = kpiYear
 
     def navigateToPmsPlanning(self):
         expect(self.page.get_by_text("PMS (B21-F14)")).to_be_visible()
@@ -16,49 +18,65 @@ class IndividualPMS(Dashboard):
         expect(self.page.get_by_role("link", name="PMS Planning")).to_be_visible()
         self.page.get_by_role("link", name="PMS Planning").click()
 
-    def chooseYear(self, kpiYear):
+    def chooseYear(self, currentYear):
         # choose 2024 for PMS
-        self.page.locator("#mat-select-value-5").click()
-        self.page.get_by_text(kpiYear).click()
+        self.page.get_by_label(f"{currentYear}").click()
+        self.page.get_by_text(self.kpiYear).click()
+        time.sleep(0.5)
 
-    def configureKPISlots(self, kpiYear, readAddSlots, readDeleteSlots):
+        #resetting total default slots
+        writeTotalSlots(5)
+
+    def configureKPISlots(self):
         self.page.get_by_label("config slot").click()
 
-        if readAddSlots:
-            for i in range(1, readAddSlots+1):
-                self.page.get_by_role("button", name="Add").click()
+        # if readAddSlots():
+        #     for i in range(1, readAddSlots()+1):
+        #         self.page.get_by_role("button", name="Add").click()
 
-        if readDeleteSlots:
-            for i in range(1, readDeleteSlots+1):
-                self.page.get_by_role("button").nth(2).click()
+        # if readDeleteSlots():
+        #     for i in range(1, readDeleteSlots()+1):
+        #         self.page.get_by_role("button").nth(2).click()
+    
+        #slotFields = "#mat-dialog-0 > app-slot-configure > div.mat-dialog-content.flex.flex-col.gap-3.ps.ps--active-y > form > div"
+        # slotFields = "app-slot-configure > div.mat-dialog-content.flex.flex-col.gap-3.ps.ps--active-y > form > div"
+        # totalSlots = self.page.locator(slotFields).count()
 
-        slotFields = "#mat-dialog-0 > app-slot-configure > div.mat-dialog-content.flex.flex-col.gap-3.ps.ps--active-y > form > div"
-        totalSlots = self.page.locator(slotFields).count()
-
-        if totalSlots == 0:
-            slotFields = "#mat-dialog-0 > app-slot-configure > div.mat-dialog-content.flex.flex-col.gap-3.ps > form > div"
-            totalSlots = self.page.locator(slotFields).count()
+        # if totalSlots == 0:
+        #     slotFields = "app-slot-configure > div.mat-dialog-content.flex.flex-col.gap-3.ps > form > div"
+        #     totalSlots = self.page.locator(slotFields).count()
         
-        writeTotalSlots(totalSlots)
-        percentage, extra = calculatePercentage()
+        # writeTotalSlots(totalSlots)
+        # print(totalSlots)
+        # percentage, extra = calculatePercentage()
 
-        for i in range(1, totalSlots+1):
-            self.page.get_by_label(f"{self.kpiname} {kpiYear} 1.{i} Weightage *").click()
-            self.page.get_by_label(f"{self.kpiname} {kpiYear} 1.{i} Weightage *").fill(str(percentage))
-            if i == totalSlots:
-                self.page.get_by_label(f"{self.kpiname} {kpiYear} 1.{i} Weightage *").click()
-                self.page.get_by_label(f"{self.kpiname} {kpiYear} 1.{i} Weightage *").fill(str(percentage+extra))
+        # for i in range(1, totalSlots+1):
+        #     self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *").click()
+        #     self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *").fill(str(percentage))
+        #     if i == totalSlots:
+        #         self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *").click()
+        #         self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *").fill(str(percentage+extra))
+
+        for i in range(1, 6):
+            self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *").click()
+            self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *").fill('20')
 
         self.page.get_by_role("button", name="Save").click()
         self.confirmSuccessPopup()
 
-    def fillupSubKPIs(self, count, readSlotCount, kpiYear):
-        kpiButton = self.page.get_by_role("button").filter(has_text=re.compile(fr"{self.kpiname} {kpiYear}"))
+    def navigateToKPI(self):
+        kpiButton = self.page.get_by_role("button").filter(has_text=re.compile(fr"{self.kpiname} {self.kpiYear}"))
         expect(kpiButton).to_be_visible()
+        
         kpiButton.click()
 
-        for kpi in range(1, readSlotCount+1):
-            self.page.get_by_text(f"{self.kpiname} {kpiYear} 1.{kpi}").click()
+    def fillupSubKPIs(self, count, start, stop):
+        #print(count, start, stop)
+        # self.page.get_by_text("Close").click()
+
+        for kpi in range(start, stop+1):
+            #print(kpi, stop)
+            self.page.get_by_text(f"{self.kpiname} {self.kpiYear} 1.{kpi}").click()
             self.page.get_by_role("button", name="Create KPI").click()
             self.page.get_by_label("KPI Name *").fill(f"Sub {self.kpiname} {count}_{kpi} (Automated)")
             self.page.get_by_label("KPI Definition *").click()
@@ -78,6 +96,8 @@ class IndividualPMS(Dashboard):
 
             self.confirmSuccessPopup()
 
+        updateTestNo()
+
     def submitKPI(self):
         expect(self.page.get_by_role("button", name="Send to Supervisor")).to_be_visible()
         self.page.get_by_role("button", name="Send to Supervisor").click()
@@ -86,28 +106,56 @@ class IndividualPMS(Dashboard):
         self.confirmSuccessPopup()
 
 class PMSApproval(Dashboard):
-    def __init__(self, page):
+    def __init__(self, page, readCurrentKpiNameJson, kpiYear):
         self.page = page
+        self.kpiName = readCurrentKpiNameJson
+        self.kpiYear = kpiYear
 
     def navigateToPmsApproval(self, readEmployeeName):
         self.page.get_by_text("Manage PMS").click()
         self.page.get_by_role("link", name="PMS Planning Approval").click()
         self.page.get_by_label("2025").locator("div").first.click()
-        self.page.get_by_text("2024").click()
+        self.page.get_by_text(f"{self.kpiYear}").click()
         self.page.get_by_role("cell").filter(has_text=re.compile(fr"{readEmployeeName}")).click()
     
-    def revertKPI(self):
+    def revertKPI(self, action="Revert"):
         self.page.get_by_role("button", name="Accept/Revert").click()
-        self.page.get_by_text("Individual Kpi 2024", exact=True).click()
-        self.page.get_by_role("button", name="Revert", exact=True).click()
+        self.page.locator("label").filter(has_text=f"{self.kpiName}").click()
+        # self.page.get_by_role("checkbox", name=f"{self.kpiName} {self.kpiYear}").click()
+        self.page.get_by_role("button", name=action, exact=True).click()
+        
+    def enterRevertReason(self):
         self.page.get_by_label("Provide clear and").click()
-        self.page.get_by_placeholder("Max 1000 characters").fill("Reverting for test")
+        self.page.get_by_placeholder("Max 1000 characters").fill(f"Reverting for test")
         self.page.get_by_role("button", name="Save").click()
 
         self.confirmSuccessPopup()
+        self.page.goto("https://test-pub-hris.robi.com.bd/")
 
-    # def changeRevertedKPI(self):
+    def acceptKpi(self):
+        self.revertKPI(action="Accept")
+        self.confirmSuccessPopup()
+        # writeDeleteSlots(readAddSlots())
+        #making sure addSlots is reset
+        # if readAddSlots()!=0:
+        #     writeAddSlots(readAddSlots() * (-1))
+        time.sleep(0.25)
+        #self.page.get_by_text("Back").click()
+        self.page.goto("https://test-pub-hris.robi.com.bd/")
 
+    # def addSlot(self, val):
+    #     writeAddSlots(val)
+
+    def editSlot(self):
+        self.page.get_by_text("Individual KPI 2024 1.1").click()
+        self.page.locator(".seconddiv > div > button").first.click()
+        self.page.get_by_label("L2 *").click()
+        self.page.get_by_label("L2 *").fill("88")
+        self.page.get_by_label("L4 *").click()
+        self.page.get_by_label("L4 *").fill("97")
+        self.page.get_by_text("Cancel Save").click()
+        self.page.get_by_role("button", name="Save").click()
+        self.page.get_by_role("button", name="Ok").click()
 
 
 #If creating a new KPI from user dashboard
@@ -136,8 +184,8 @@ class NewPMS(IndividualPMS):
         self.page.get_by_label("config slot").click()
         self.page.get_by_text("Individual KPI, weightage:").click()
         self.page.get_by_role("option").filter(has_text="Test KPI").click()
-        for i in range(1, slots+1):
-            self.page.get_by_role("button", name="Add").click()
+        # for i in range(1, slots+1):
+        #     self.page.get_by_role("button", name="Add").click()
 
         self.page.get_by_label("Test KPI 2.1 Weightage *").click()
         self.page.get_by_label("Test KPI 2.1 Weightage *").fill("33.5")
