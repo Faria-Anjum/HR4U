@@ -1,6 +1,5 @@
-import pytest
+import pytest, math, calendar, json
 from datetime import datetime, date
-import calendar, json
 
 #all test functions in a test file run on the same browser context
 @pytest.fixture(scope="module")
@@ -15,47 +14,16 @@ def employeeLogin():
     return json_data['login']['employeeEmail'], json_data['login']['employeePass'], json_data['login']['employeeName']
 
 @pytest.fixture
+def readEmployeeName():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['login']['employeeName']
+
+@pytest.fixture
 def managerLogin():
     with open(r"files\data.json",'r') as f:
         json_data = json.load(f)
     return json_data['login']['managerEmail'], json_data['login']['managerPass'], json_data['login']['managerName']
-
-# KPI already there in profile - Individual KPI by default
-@pytest.fixture
-def readCurrentKpiNameJson():
-    with open(r"files\data.json",'r') as f:
-        json_data = json.load(f)
-    return json_data['kpi']['current_profile']
-
-# New created KPI
-@pytest.fixture
-def readNewKpiNameJson():
-    with open(r"files\data.json",'r') as f:
-        json_data = json.load(f)
-    return json_data['kpi']['new_profile']
-
-# slots for new KPI
-@pytest.fixture
-def slots():
-    with open(r"files\data.json",'r') as f:
-        json_data = json.load(f)
-    return json_data['kpi']['slotcount']
-
-# Counter for how many times Sub KPIs have been created
-@pytest.fixture
-def count():
-    with open(r"files\data.json",'r') as f:
-        json_data = json.load(f)
-    return json_data['kpi']['testcounter']
-
-# @pytest.fixture
-# def increaseTestCounter():
-#     with open(r"files\data.json", 'r') as f:
-#         json_data = json.load(f)
-#         json_data['testcounter'] += 1
-
-#     with open(r"files\data.json", 'w') as f:
-#         f.write(json.dumps(json_data))
 
 @pytest.fixture
 def readRemainingLeave():
@@ -68,6 +36,75 @@ def readUpdatedLeave():
     with open(r"files\data.json",'r') as f:
         json_data = json.load(f)
     return json_data['leave']['updatedLeave']
+
+@pytest.fixture
+def readSlotCount():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['pms']['totalSlots']
+
+@pytest.fixture
+def calculatePercentage():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+        total = json_data['pms']['totalSlots']
+        eachslot = 100/total
+        percentage1 = math.floor(eachslot)
+        extra = int(100 - (percentage1*total))
+        return percentage1, extra
+
+# KPI already there in profile - Individual KPI by default
+@pytest.fixture
+def readCurrentKpiNameJson():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['pms']['current_KPI_profile']
+
+@pytest.fixture
+def kpiYear():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['pms']['current_KPI_year']
+
+@pytest.fixture
+def readAddSlots():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['pms']['add_slots']
+
+@pytest.fixture
+def readDeleteSlots():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['pms']['delete_slots']
+
+# New created KPI
+@pytest.fixture
+def readNewKpiNameJson():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['pms']['new_KPI_profile']
+
+# slots for new KPI
+@pytest.fixture
+def slots():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['pms']['newslotcount']
+
+# Counter for how many times Sub KPIs have been created
+@pytest.fixture
+def count():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['pms']['testcounter']
+
+#getting current year
+@pytest.fixture(scope="session")
+def currentYear():
+    today = datetime.now()
+    year = today.year
+    return year
 
 #setting today's date
 @pytest.fixture(scope="session")

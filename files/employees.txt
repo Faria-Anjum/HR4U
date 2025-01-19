@@ -1,3 +1,6 @@
 riyad.salehdin@robi.com.bd
 salman.ahmed@robi.com.bd
 farah.mahtab@robi.com.bd
+#mat-dialog-5 > app-slot-configure > div.mat-dialog-content.flex.flex-col.gap-3.ps > form > div:nth-child(1)
+#mat-dialog-5 > app-slot-configure > div.mat-dialog-content.flex.flex-col.gap-3.ps.ps--active-y > form > div:nth-child(1)
+
