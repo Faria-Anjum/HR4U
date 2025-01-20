@@ -1,5 +1,11 @@
 from tests.test_01_leave import test_navigateToLogin as navigate, test_enterEmployeeCredentials as loginemployee, test_loginAsManager as loginmanager, test_logout as logout
 from models.profile import ProfilePage, TrainingPage
+import pytest
+
+@pytest.fixture(scope="module")
+def page(browser):
+    page = browser.new_page()
+    return page
 
 def test_employeeLogin(page, employeeLogin):
     navigate(page)

@@ -1,1 +1,33 @@
-{"profile": {"testCount": 9, "trainingName": "Test Training ", "trainingInstitution": "Testing Institution", "trainingSkills": "Testing skills", "trainingUrl": "https://test-pub-hris.robi.com.bd/ess/ess-employee-profile/ess-employee-training-information"}, "login": {"employeeEmail": "salman.ahmed@robi.com.bd", "employeePass": "Robi@12345$$", "employeeName": "Salman Ahmed", "managerEmail": "al.jamil@robi.com.bd", "managerPass": "Robi@12345$$", "managerName": "Mohammad Al Jamil"}, "leave": {"remainingLeave": 36.5, "duration": 2.0, "updatedLeave": 34.5}, "pms": {"current_KPI_profile": "Individual KPI", "current_KPI_year": "2024", "new_KPI_profile": "Test KPI", "testcounter": 10.5, "init_slots": 0, "add_slots": 0, "delete_slots": 0, "totalSlots": 5, "newslotcount": 3}}
+{
+    "profile": {
+        "testCount": 9,
+        "trainingName": "Test Training ",
+        "trainingInstitution": "Testing Institution",
+        "trainingSkills": "Testing skills",
+        "trainingUrl": "https://test-pub-hris.robi.com.bd/ess/ess-employee-profile/ess-employee-training-information"
+    },
+    "login": {
+        "employeeEmail": "salman.ahmed@robi.com.bd",
+        "employeePass": "Robi@12345$$",
+        "employeeName": "Salman Ahmed",
+        "managerEmail": "al.jamil@robi.com.bd",
+        "managerPass": "Robi@12345$$",
+        "managerName": "Mohammad Al Jamil"
+    },
+    "leave": {
+        "remainingLeave": 36.5,
+        "duration": 2.0,
+        "updatedLeave": 34.5
+    },
+    "pms": {
+        "current_KPI_profile": "Individual KPI",
+        "current_KPI_year": "2024",
+        "new_KPI_profile": "Test KPI",
+        "testcounter": 10.5,
+        "init_slots": 0,
+        "add_slots": 0,
+        "delete_slots": 0,
+        "totalSlots": 5,
+        "newslotcount": 3
+    }
+}
