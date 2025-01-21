@@ -9,7 +9,7 @@ def test_employeeLogin(page, employeeLogin):
 
 def test_navigateToPMS(page, kpiYear, readCurrentKpiNameJson, currentYear):
     pms = IndividualPMS(page, readCurrentKpiNameJson, kpiYear)
-    #page.pause()
+    # page.pause()
     pms.navigateToPmsPlanning()
     pms.chooseYear(currentYear)
 

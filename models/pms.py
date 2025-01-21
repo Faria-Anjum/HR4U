@@ -58,14 +58,14 @@ class IndividualPMS(Dashboard):
         #         self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *").fill(str(percentage+extra))
 
         for i in range(1, 6):
-            self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *").click()
-            self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *").fill('20')
+            self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *" or f"{self.kpiname} 1.{i} Weightage *").click()
+            self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *" or f"{self.kpiname} 1.{i} Weightage *").fill('20')
 
         self.page.get_by_role("button", name="Save").click()
         self.confirmSuccessPopup()
 
     def navigateToKPI(self):
-        kpiButton = self.page.get_by_role("button").filter(has_text=re.compile(fr"{self.kpiname} {self.kpiYear}"))
+        kpiButton = self.page.get_by_role("button").filter(has_text=re.compile(fr"{self.kpiname} {self.kpiYear}" or fr"{self.kpiname}"))
         expect(kpiButton).to_be_visible()
         
         kpiButton.click()
@@ -76,7 +76,7 @@ class IndividualPMS(Dashboard):
 
         for kpi in range(start, stop+1):
             #print(kpi, stop)
-            self.page.get_by_text(f"{self.kpiname} {self.kpiYear} 1.{kpi}").click()
+            self.page.get_by_text(f"{self.kpiname} {self.kpiYear} 1.{kpi}" or f"{self.kpiname} 1.{kpi}").click()
             self.page.get_by_role("button", name="Create KPI").click()
             self.page.get_by_label("KPI Name *").fill(f"Sub {self.kpiname} {count}_{kpi} (Automated)")
             self.page.get_by_label("KPI Definition *").click()
@@ -176,7 +176,20 @@ class PMSSelfEvaluation(Dashboard):
 
     def fillupKpiEvals(self):
         for kpi in range(1, 6):
-            self.page.get_by_text(f"{self.kpiname} {self.kpiYear} 1.{kpi}").click()
+            
+            # kpiButton = self.page.get_by_role("button").filter(has_text=re.compile(fr"{self.kpiname} {self.kpiYear}"))
+            # subkpi = kpiButton.locator("div").filter(has_text=re.compile(f"{self.kpiname} {self.kpiYear} 1.{kpi}" or f"{self.kpiname} 1.{kpi}")).nth(1)
+            # print(subkpi)
+
+            # subkpi.click()
+
+            # regex_pattern = fr"{re.escape(self.kpiname)}(?: {re.escape(self.kpiYear)})? 1\.{kpi}"
+            # self.page.get_by_role("label").filter(has_text=re.compile(regex_pattern)).click()
+            
+            # self.page.get_by_role("label").filter(
+            # has_text=re.compile(fr"{self.kpiname} {re.escape(self.kpiYear)}? 1\.{kpi}")).click()
+            
+            self.page.get_by_text(f"{self.kpiname} {self.kpiYear} 1.{kpi}" or f"{self.kpiname} 1.{kpi}").click()
             self.enterIndividualAchievement()
         
     def submitToSupervisor(self):
@@ -189,8 +202,10 @@ class PMSSelfEvaluation(Dashboard):
         self.confirmSuccessPopup()
 
 class PMSEvaluationApproval(Dashboard):
-    def __init__(self, page):
+    def __init__(self, page, readCurrentKpiNameJson, kpiYear):
         self.page = page
+        self.kpiname = readCurrentKpiNameJson
+        self.kpiYear = kpiYear
 
     def navigateToPmsEvaluationApproval(self, readEmployeeName):
         self.page.get_by_text("Manage PMS").click()
@@ -199,169 +214,46 @@ class PMSEvaluationApproval(Dashboard):
 
     def evaluateEvaluation(self):
         for kpi in range(1, 6):
-            self.page.get_by_text(f"{self.kpiname} {self.kpiYear} 1.{kpi}").click()
+            self.page.get_by_text(f"{self.kpiname} {self.kpiYear} 1.{kpi}" or f"{self.kpiname} 1.{kpi}").click()
 
-            self.selectTheHow()
+            self.selectTheHow(random.randint(3,5))
             self.page.get_by_placeholder("Did the employee take").click()
             self.page.get_by_placeholder("Did the employee take").fill("Test Remark")
 
             self.page.get_by_role("button", name="Save").click()
             self.confirmSuccessPopup()
 
-    def selectTheHow(self):
+    def selectTheHow(self, val):
         expect(self.page.locator("span").filter(has_text="LM Evaluation: The 'How' *")).to_be_visible()
         self.page.locator("span").filter(has_text="LM Evaluation: The 'How' *").click()
-        score = str(random.randint(3,5))
-        self.page.get_by_text(score, exact=True).click()
+        score = str(val)
+        self.page.get_by_role("option", name=score).click()
 
-    def fillupManagerForms(self):
-        self.page.get_by_role("button", name="Form (2)").click()
-        self.page.get_by_text("Core Value Assessment * Pending")
+    def fillupCoreValueAssessment(self):
+        self.page.get_by_role("button").filter(has_text=re.compile(r"Form")).click()
+        self.page.get_by_text(re.compile(r"Core Value Assessment")).click()
         self.page.get_by_role("button", name="OK").click()
+
         self.page.locator("label").filter(has_text="Living the Values").click()
-
-    # self.page.get_by_role("button", name="Form (2)").click()
-    # self.page.get_by_text("Core Value Assessment * Pending").click()
-    # self.page.locator("#mat-radio-3 > .mat-radio-label > .mat-radio-container").click()
-    # self.page.locator("#mat-radio-4 > .mat-radio-label > .mat-radio-container > .mat-radio-outer-circle").click()
-    # self.page.locator("label").filter(has_text="Obsession For Customers").click()
-    # self.page.get_by_text("Below Par").click()
-    # self.page.locator("#mat-radio-3 > .mat-radio-label > .mat-radio-container").click()
-    # self.page.locator("a").filter(has_text="See Core Value Description").click()
-    # self.page.get_by_label("Close dialog").click()
-    # self.page.locator("a").filter(has_text="Core Values Rating Scale").click()
-    # self.page.get_by_role("button", name="OK").click()
-    # self.page.get_by_role("button", name="Save").click()
-    # self.page.get_by_role("button", name="Ok").click()
-    # self.page.get_by_text("Individual Development Plan").click()
-    # self.page.get_by_text("Development Plan [T&D]: Manager").click()
-    # self.page.get_by_role("button", name="Accept/Revert").click()
-    # self.page.get_by_text("Individual Kpi 2024", exact=True).click()
-    # self.page.locator("#mat-menu-panel-2 div").filter(has_text="Core Value Assessment").nth(1).click()
-    # self.page.locator("#mat-menu-panel-2 div").filter(has_text="Core Value Assessment").nth(1).click()
-    # self.page.locator("#mat-checkbox-3 > .mat-checkbox-layout > .mat-checkbox-inner-container").click()
-    # self.page.locator("#mat-checkbox-4 > .mat-checkbox-layout > .mat-checkbox-inner-container").click()
-    # self.page.get_by_role("button", name="Accept", exact=True).click()
-    # self.page.locator(".cdk-overlay-backdrop").click()
-    # self.page.get_by_text("Individual Development Plan 2024 * Pending").click()
-    # self.page.get_by_text("Development Plan [T&D]: Employee").click()
-    # self.page.get_by_role("tab", name="Development Plan [T&D]: Manager").locator("div").click()
-    # self.page.get_by_text("Development Plan [T&D]: Employee").click()
-    # self.page.get_by_role("tab", name="Development Plan [T&D]: Manager").locator("div").click()
-    # self.page.get_by_text("Yes").click()
-    # self.page.get_by_label("Do you recommend any").click()
-    # self.page.get_by_placeholder("The above will be used to").fill("/no")
-    # self.page.get_by_role("button", name="Save").click()
-    # self.page.get_by_role("button", name="Ok").click()
-    # self.page.get_by_text("Core Value Assessment * Pending").click()
-    # self.page.get_by_role("button", name="KPI (1)").click()
-    # self.page.get_by_role("button", name="Individual KPI 2024 * Pending").click()
-    # self.page.get_by_label("KPI (1)").get_by_text("Individual KPI 2024 1.2").click()
-    # self.page.locator("#mat-select-value-13").click()
-    # self.page.get_by_text("5", exact=True).click()
-    # self.page.get_by_placeholder("Did the employee take").click()
-    # self.page.get_by_placeholder("Did the employee take").fill("Test Remark")
-    # self.page.get_by_role("button", name="Save").click()
-    # self.page.get_by_role("button", name="Ok").click()
-    # self.page.get_by_label("KPI (1)").get_by_text("Individual KPI 2024 1.4").click()
-    # self.page.locator("#mat-select-value-13").click()
-    # self.page.get_by_text("3", exact=True).click()
-    # self.page.get_by_placeholder("Did the employee take").click()
-    # self.page.get_by_placeholder("Did the employee take").fill("Test Remark")
-    # self.page.get_by_role("button", name="Save").click()
-    # self.page.get_by_role("button", name="Ok").click()
-    # self.page.get_by_label("KPI (1)").get_by_text("Individual KPI 2024 1.5").click()
-    # self.page.locator("#mat-select-value-13").click()
-    # self.page.get_by_text("2", exact=True).click()
-    # self.page.locator("#mat-select-value-13").click()
-    # self.page.get_by_text("5", exact=True).click()
-    # self.page.get_by_placeholder("Did the employee take").click()
-    # self.page.get_by_placeholder("Did the employee take").fill("Test remark")
-    # self.page.get_by_role("button", name="Save").click()
-    # self.page.get_by_role("button", name="Ok").click()
-    # self.page.get_by_label("KPI (1)").get_by_text("Individual KPI 2024 1.3").click()
-    # self.page.locator("#mat-select-value-13").click()
-    # self.page.get_by_text("5", exact=True).click()
-    # self.page.get_by_placeholder("Did the employee take").click()
-    # self.page.get_by_placeholder("Did the employee take").fill("Test remark")
-    # self.page.get_by_role("button", name="Save").click()
-    # self.page.get_by_role("button", name="Ok").click()
-    # self.page.get_by_role("button", name="Accept/Revert").click()
-    # self.page.get_by_role("button", name="Accept", exact=True).click()
-    # self.page.locator(".mat-slide-toggle-thumb").click()
-    # self.page.locator(".mat-slide-toggle-thumb").click()
-    # self.page.get_by_role("button", name="Save").click()
-    # self.page.get_by_role("button", name="Ok").click()
-    # self.page.locator(".cdk-overlay-backdrop").click()
-
-
-#If creating a new KPI from user dashboard
-class NewPMS(IndividualPMS):
-    def __init__(self, page):
-        self.page = page
-
-    def configureNewCoreKPI(self, readNewKpiNameJson):
-        self.page.get_by_label("config profile").click() #config core kpi
-        
-        self.page.get_by_role("button", name="Add").click()
-        self.page.get_by_label("Profile Title").nth(1).click()
-        self.page.get_by_label("Profile Title").nth(1).fill(readNewKpiNameJson)
-
-        self.page.get_by_label("Profile Weightage *").first.click()
-        self.page.get_by_label("Profile Weightage *").first.fill('80')
-        self.page.get_by_label("Profile Weightage *").nth(1).click()
-        self.page.get_by_label("Profile Weightage *").nth(1).fill('20')
-
         self.page.get_by_role("button", name="Save").click()
-        expect(self.page.get_by_text("Success", exact = True)).to_be_visible()
-        self.page.get_by_role("button", name="Ok").click()
+        self.confirmSuccessPopup()
 
-    #When creating a new KPI from user dashboard
-    def configureThreeKPISlots(self, slots):
-        self.page.get_by_label("config slot").click()
-        self.page.get_by_text("Individual KPI, weightage:").click()
-        self.page.get_by_role("option").filter(has_text="Test KPI").click()
-        # for i in range(1, slots+1):
-        #     self.page.get_by_role("button", name="Add").click()
+    def fillupIndividualDevelopmentPlan(self):
+        self.page.get_by_text("Individual Development Plan").click()
+        self.page.get_by_text("Development Plan [T&D]: Manager").click()
 
-        self.page.get_by_label("Test KPI 2.1 Weightage *").click()
-        self.page.get_by_label("Test KPI 2.1 Weightage *").fill("33.5")
-        self.page.get_by_label("Test KPI 2.2 Weightage *").click()
-        self.page.get_by_label("Test KPI 2.2 Weightage *").fill("33.5")
-        self.page.get_by_label("Test KPI 2.3 Weightage *").click()
-        self.page.get_by_label("Test KPI 2.3 Weightage *").fill("33")
+        self.page.get_by_role("tab", name="Development Plan [T&D]: Manager").locator("div").click()
+        expect(self.page.locator("mat-radio-button").filter(has_text="Yes")).to_be_visible()
+        self.page.locator("mat-radio-button").filter(has_text="Yes").click()
 
+        self.page.get_by_label("Do you recommend any").click()
+        self.page.get_by_placeholder("The above will be used to").fill("/no")
         self.page.get_by_role("button", name="Save").click()
-        expect(self.page.get_by_text("Success", exact = True)).to_be_visible()
-        self.page.get_by_role("button", name="Ok").click()
+        self.confirmSuccessPopup()
 
-    #When creating a new KPI from user dashboard
-    def createNewSubKPI(self, readNewKpiNameJson, slots, count):
-        kpiButton = self.page.get_by_role("button").filter(has_text=re.compile(fr"{readNewKpiNameJson}"))
-        expect(kpiButton).to_be_visible()
-        kpiButton.click()
-
-        kpino = 2
-
-        for kpi in range(1, slots+1):
-            self.page.get_by_text(f"{readNewKpiNameJson} {kpino}.{kpi}").click()
-            self.page.get_by_role("button", name="Create KPI").click()
-            self.page.get_by_label("KPI Name *").fill(f"Sub {readNewKpiNameJson} {count}_{kpi} (Automated)")
-            self.page.get_by_label("KPI Definition *").click()
-            self.page.get_by_placeholder("Write Your Kpi Definition").fill(f"Sub {readNewKpiNameJson} {kpi}")
-
-            var = 80
-            for l in range(1,6):
-                self.page.get_by_label(f"L{l} *").click()
-                self.page.get_by_label(f"L{l} *").fill(f"{var}")
-                var+=5
-
-                self.page.get_by_label(f"L{l} Definition *").click()
-                self.page.get_by_label(f"L{l} Definition *").fill(f"L{l} def")
-
-            expect(self.page.get_by_role("button", name="Save")).to_be_visible()
-            self.page.get_by_role("button", name="Save").click()
-
-            self.confirmSuccessPopup()
-
-        updateTestNo()
+    def submitEvaluation(self):
+        self.page.get_by_role("button", name="Accept/Revert").click()
+        self.page.locator("label").filter(has_text="Select All").click()
+        self.page.get_by_role("button", name="Accept", exact=True).click()
+        self.page.get_by_role("button", name="Save").click()
+        self.confirmSuccessPopup()

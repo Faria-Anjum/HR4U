@@ -2,7 +2,7 @@ import pytest, math, calendar, json
 from datetime import datetime, date
 
 #all test functions in a test file run on the same browser context
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def page(browser):
     page = browser.new_page()
     return page
@@ -45,6 +45,11 @@ def expDate():
     # day = f'{day} {month} {year}'
     return str(day), str(month), str(year)
 
+@pytest.fixture
+def adminLogin():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['login']['adminEmail'], json_data['login']['adminPass'], json_data['login']['employeeName']
 
 
 @pytest.fixture
@@ -80,7 +85,6 @@ def readTrainingUrl():
     with open(r"files\data.json",'r') as f:
         json_data = json.load(f)
     return json_data['profile']['trainingUrl']
-
 
 
 @pytest.fixture

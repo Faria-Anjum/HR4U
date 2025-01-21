@@ -1,18 +1,20 @@
 {
-    "profile": {
-        "testCount": 9,
-        "trainingName": "Test Training ",
-        "trainingInstitution": "Testing Institution",
-        "trainingSkills": "Testing skills",
-        "trainingUrl": "https://test-pub-hris.robi.com.bd/ess/ess-employee-profile/ess-employee-training-information"
-    },
     "login": {
         "employeeEmail": "salman.ahmed@robi.com.bd",
         "employeePass": "Robi@12345$$",
         "employeeName": "Salman Ahmed",
         "managerEmail": "al.jamil@robi.com.bd",
         "managerPass": "Robi@12345$$",
-        "managerName": "Mohammad Al Jamil"
+        "managerName": "Mohammad Al Jamil",
+        "adminEmail": "backofficesupport@hr4u.com",
+        "adminPass": "PM$Re$cale2024"
+    },
+    "profile": {
+        "testCount": 10.5,
+        "trainingName": "Test Training ",
+        "trainingInstitution": "Testing Institution",
+        "trainingSkills": "Testing skills",
+        "trainingUrl": "https://test-pub-hris.robi.com.bd/ess/ess-employee-profile/ess-employee-training-information"
     },
     "leave": {
         "remainingLeave": 36.5,
