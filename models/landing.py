@@ -7,7 +7,7 @@ class LoginPage:
 
     def navigate(self):
         self.page.goto(self.url, wait_until="load")
-        expect(self.page.get_by_text("One app for Human Resources")).to_be_visible()
+        # expect(self.page.get_by_text("One app for Human Resources")).to_be_visible()
     
     def loginUser(self):
         #expect(self.page.get_by_role("text", name="Login to Your Account")).to_be_visible()

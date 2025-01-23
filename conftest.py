@@ -70,6 +70,11 @@ def managerLogin():
         json_data = json.load(f)
     return json_data['login']['managerEmail'], json_data['login']['managerPass'], json_data['login']['managerName']
 
+@pytest.fixture
+def secondLMLogin():
+    with open(r"files\data.json",'r') as f:
+        json_data = json.load(f)
+    return json_data['login']['secondLMEmail'], json_data['login']['secondLMPass']
 
 
 @pytest.fixture
@@ -98,7 +103,6 @@ def readUpdatedLeave():
     with open(r"files\data.json",'r') as f:
         json_data = json.load(f)
     return json_data['leave']['updatedLeave']
-
 
 
 @pytest.fixture
@@ -186,12 +190,21 @@ def today():
 
 #three day date
 @pytest.fixture(scope="session")
-def three():
+def threedays():
     today = datetime.now()
 
-    year = today.year
-    month = calendar.month_name[today.month]
-    day = today.day + 2
+    if today.day in [28,29,30,31]:
+        if today.month == 12:
+            month = 1
+            year = today.year + 1
+        else:
+            month = today.month + 1
+            year = today.year
+        day = 1
+    else:
+        year = today.year
+        month = today.month
+        day = today.day + 3
 
     day = f'{day} {month} {year}'
     return day

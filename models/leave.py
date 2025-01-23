@@ -7,9 +7,8 @@ from playwright.sync_api import expect
 import re, time
 
 class LeaveRequest(Dashboard):
-    def __init__(self, page, employeeLogin):
+    def __init__(self, page):
         self.page = page
-        self.email, self.password, self.name = employeeLogin
 
     def navigateToLeaveRequest(self):
         expect(self.page.get_by_role("link", name="Leave Request")).to_be_visible()

@@ -58,16 +58,24 @@ class IndividualPMS(Dashboard):
         #         self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *").fill(str(percentage+extra))
 
         for i in range(1, 6):
-            self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *" or f"{self.kpiname} 1.{i} Weightage *").click()
-            self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *" or f"{self.kpiname} 1.{i} Weightage *").fill('20')
+            kpi = self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *")
+            if kpi.is_visible():
+                kpi = kpi
+            else:
+                kpi = self.page.get_by_label(f"{self.kpiname} 1.{i} Weightage *")
+
+            kpi.click()
+            kpi.fill('20')
 
         self.page.get_by_role("button", name="Save").click()
         self.confirmSuccessPopup()
 
     def navigateToKPI(self):
-        kpiButton = self.page.get_by_role("button").filter(has_text=re.compile(fr"{self.kpiname} {self.kpiYear}" or fr"{self.kpiname}"))
-        expect(kpiButton).to_be_visible()
-        
+        kpiButton = self.page.get_by_role("button").filter(has_text=re.compile(fr"{self.kpiname} {self.kpiYear}"))
+        if kpiButton.is_visible():
+            kpiButton = kpiButton
+        else:
+            kpiButton = self.page.get_by_role("button").filter(has_text=re.compile(fr"{self.kpiname}"))
         kpiButton.click()
 
     def fillupSubKPIs(self, count, start, stop):
@@ -76,7 +84,13 @@ class IndividualPMS(Dashboard):
 
         for kpi in range(start, stop+1):
             #print(kpi, stop)
-            self.page.get_by_text(f"{self.kpiname} {self.kpiYear} 1.{kpi}" or f"{self.kpiname} 1.{kpi}").click()
+            subkpi = self.page.get_by_text(f"{self.kpiname} {self.kpiYear} 1.{kpi}")
+            if subkpi.is_visible():
+                subkpi = subkpi
+            else:
+                subkpi = self.page.get_by_text(f"{self.kpiname} 1.{kpi}")
+
+            subkpi.click()
             self.page.get_by_role("button", name="Create KPI").click()
             self.page.get_by_label("KPI Name *").fill(f"Sub {self.kpiname} {count}_{kpi} (Automated)")
             self.page.get_by_label("KPI Definition *").click()
@@ -106,6 +120,15 @@ class IndividualPMS(Dashboard):
         self.confirmSuccessPopup()
 
 class PMSApproval(Dashboard):
+    def __init__(self, page, readCurrentKpiNameJson, kpiYear):
+        self.page = page
+        self.kpiname = readCurrentKpiNameJson
+        self.kpiYear = kpiYear
+
+    def navigateToManagerDashboard(self):
+        self.page.get_by_text("Manager", exact=True).click()
+        self.page.get_by_text("Manager Dashboard", exact=True).click()
+
     def navigateToPmsApproval(self, readEmployeeName):
         self.page.get_by_text("Manage PMS").click()
         self.page.get_by_role("link", name="PMS Planning Approval").click()
@@ -115,7 +138,13 @@ class PMSApproval(Dashboard):
     
     def revertKPI(self, action="Revert"):
         self.page.get_by_role("button", name="Accept/Revert").click()
-        self.page.locator("label").filter(has_text=f"{self.kpiName}").click()
+
+        kpi = self.page.locator("label").filter(has_text=f"{self.kpiname} {self.kpiYear}")
+        if kpi.is_visible():
+            kpi = kpi
+        else:
+            kpi = self.page.locator("label").filter(has_text=f"{self.kpiname}")
+        kpi.click()
         # self.page.get_by_role("checkbox", name=f"{self.kpiName} {self.kpiYear}").click()
         self.page.get_by_role("button", name=action, exact=True).click()
         
@@ -128,7 +157,10 @@ class PMSApproval(Dashboard):
         self.page.goto("https://test-pub-hris.robi.com.bd/")
 
     def acceptKpi(self):
-        self.revertKPI(action="Accept")
+        self.page.get_by_role("button", name="Accept/Revert").click()
+        self.page.locator("label").filter(has_text="Select All").click()
+        # self.page.get_by_role("checkbox", name=f"{self.kpiName} {self.kpiYear}").click()
+        self.page.get_by_role("button", name="Accept", exact=True).click()
         self.confirmSuccessPopup()
         # writeDeleteSlots(readAddSlots())
         #making sure addSlots is reset
@@ -142,7 +174,12 @@ class PMSApproval(Dashboard):
     #     writeAddSlots(val)
 
     def editSlot(self):
-        self.page.get_by_text("Individual KPI 2024 1.1").click()
+        kpi = self.page.get_by_text("Individual KPI 2024 1.1")
+        if kpi.is_visible():
+            kpi = kpi
+        else:
+            kpi = self.page.get_by_text("Individual KPI 1.1")
+        kpi.click()
         self.page.locator(".seconddiv > div > button").first.click()
         self.page.get_by_label("L2 *").click()
         self.page.get_by_label("L2 *").fill("88")
@@ -151,6 +188,7 @@ class PMSApproval(Dashboard):
         self.page.get_by_text("Cancel Save").click()
         self.page.get_by_role("button", name="Save").click()
         self.page.get_by_role("button", name="Ok").click()
+
 
 class PMSSelfEvaluation(Dashboard):
     def __init__(self, page, readCurrentKpiNameJson, kpiYear):
@@ -188,8 +226,14 @@ class PMSSelfEvaluation(Dashboard):
             
             # self.page.get_by_role("label").filter(
             # has_text=re.compile(fr"{self.kpiname} {re.escape(self.kpiYear)}? 1\.{kpi}")).click()
-            
-            self.page.get_by_text(f"{self.kpiname} {self.kpiYear} 1.{kpi}" or f"{self.kpiname} 1.{kpi}").click()
+
+            subkpi = self.page.get_by_text(f"{self.kpiname} {self.kpiYear} 1.{kpi}")
+            if subkpi.is_visible():
+                subkpi = subkpi
+            else:
+                subkpi = self.page.get_by_text(f"{self.kpiname} 1.{kpi}")
+
+            subkpi.click()
             self.enterIndividualAchievement()
         
     def submitToSupervisor(self):
@@ -214,7 +258,13 @@ class PMSEvaluationApproval(Dashboard):
 
     def evaluateEvaluation(self):
         for kpi in range(1, 6):
-            self.page.get_by_text(f"{self.kpiname} {self.kpiYear} 1.{kpi}" or f"{self.kpiname} 1.{kpi}").click()
+            subkpi = self.page.get_by_text(f"{self.kpiname} {self.kpiYear} 1.{kpi}")
+            if subkpi.is_visible():
+                subkpi = subkpi
+            else:
+                subkpi = self.page.get_by_text(f"{self.kpiname} 1.{kpi}")
+
+            subkpi.click()
 
             self.selectTheHow(random.randint(3,5))
             self.page.get_by_placeholder("Did the employee take").click()
@@ -257,3 +307,6 @@ class PMSEvaluationApproval(Dashboard):
         self.page.get_by_role("button", name="Accept", exact=True).click()
         self.page.get_by_role("button", name="Save").click()
         self.confirmSuccessPopup()
+
+    # def loginAsSecondLM(self, secondLMLogin):
+    #     email, pw = secondLMLogin
