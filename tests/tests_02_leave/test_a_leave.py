@@ -1,33 +1,25 @@
-from models.landing import Dashboard
+from tests.tests_01_landing.test_a_profile import test_navigateToLogin as navigate, test_enterEmployeeCredentials as loginemployee
 from models.leave import LeaveRequest, AcceptRequest, VerifyAccepted
+from models.profile import ProfilePage
 
 #add weekend valdation
 
-def test_navigateToLogin(page):
-    #page.pause()
-    '''User can navigate to login'''
-    dash = Dashboard(page)
-    dash.navigate()
-    
-def test_enterEmployeeCredentials(page, employeeLogin):
-    '''User can login'''
-    login = LeaveRequest(page, employeeLogin)
-    login.loginUser()
-    login.loginPass()
-    login.clickLogIn()
+def test_employeeLogin(page, employeeLogin):
+    navigate(page)
+    loginemployee(page, employeeLogin)
 
-def test_requestLeave(page, today, three, employeeLogin):
-    leave = LeaveRequest(page, employeeLogin)
+def test_requestLeave(page, today, threedays):
+    leave = LeaveRequest(page)
     leave.navigateToLeaveRequest()
     leave.requestNewLeave()
     leave.selectAnnualLeave()
     leave.checkRemaining()
-    leave.selectDate(today, three)
+    leave.selectDate(today, threedays)
     leave.getDuration()
     leave.confirmLeaveRequest()
 
 def test_logout(page, employeeLogin):
-    logout = LeaveRequest(page, employeeLogin)
+    logout = ProfilePage(page, employeeLogin)
     logout.logout()
     logout.loginShortcut()
 
@@ -47,6 +39,6 @@ def test_acceptRequest(page, managerLogin):
 
 def test_verifyRemaining(page, readUpdatedLeave, employeeLogin):
     leave = VerifyAccepted(page)
-    test_enterEmployeeCredentials(page, employeeLogin)
+    loginemployee(page, employeeLogin)
     leave.navigateToLeaveRequest()
     leave.checkRemaining(readUpdatedLeave)

@@ -4,8 +4,9 @@ from playwright.sync_api import expect
 import re, time
 
 class ProfilePage(Dashboard):
-    def __init__(self, page):
+    def __init__(self, page, employeeLogin):
         self.page = page
+        self.email, self.password, self.name = employeeLogin
 
     def navigateToProfilePage(self):
         expect(self.page.locator("user div").first).to_be_visible()

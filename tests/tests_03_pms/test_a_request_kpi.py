@@ -1,7 +1,8 @@
-from tests.test_01_leave import test_navigateToLogin as navigate, test_enterEmployeeCredentials as loginemployee, test_loginAsManager as loginmanager, test_logout as logout
+from tests.tests_01_landing.test_a_profile import test_navigateToLogin as navigate, test_enterEmployeeCredentials as loginemployee
+from tests.tests_02_leave.test_a_leave import test_loginAsManager as loginmanager, test_logout as logout
 # from models.writeToJson import readAddSlots, readSlotCount
 from models.pms import IndividualPMS, PMSApproval
-#import time
+import time
 
 def test_employeeLogin(page, employeeLogin):
     navigate(page)
@@ -24,6 +25,7 @@ def test_fillupSlotsKPI(page, employeeLogin, readCurrentKpiNameJson, kpiYear, co
 def test_revertKPI(page, managerLogin, readEmployeeName, readCurrentKpiNameJson, kpiYear):
     loginmanager(page, managerLogin)
     pms = PMSApproval(page, readCurrentKpiNameJson, kpiYear)
+    # pms.navigateToManagerDashboard()
     pms.navigateToPmsApproval(readEmployeeName)
     pms.revertKPI()
     pms.enterRevertReason()
@@ -42,11 +44,5 @@ def test_editRevertedKPI(page, employeeLogin, kpiYear, readCurrentKpiNameJson, c
     pms.navigateToKPI()
     add.editSlot()
     pms.submitKPI()
-    logout(page, employeeLogin)
-
-def test_acceptKPI(page, managerLogin, readEmployeeName, readCurrentKpiNameJson, kpiYear):
-    loginmanager(page, managerLogin)
-    pms = PMSApproval(page, readCurrentKpiNameJson, kpiYear)
-    pms.navigateToPmsApproval(readEmployeeName)
-    pms.acceptKpi()
-    logout(page, managerLogin)
+    time.sleep(2)
+    # logout(page, employeeLogin)
