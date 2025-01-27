@@ -1,16 +1,16 @@
 from models.landing import Dashboard
-from models.writeToJson import writeTotalSlots, writeAddSlots, writeDeleteSlots, calculatePercentage, increaseTestCounter as updateTestNo
-# from models.writeToJson import readAddSlots, readDeleteSlots, readSlotCount
+from files.readFromJson import readCurrentKpiName, readKpiYear, readKpiCount as count, readEmployeeName
+from files.writeToJson import increaseTestCounter as updateTestNo
 from playwright.sync_api import expect
 import re, time, random
 
 #core and sub kpi configuration hardcoded, dynamic needs work
 
 class IndividualPMS(Dashboard):
-    def __init__(self, page, readCurrentKpiNameJson, kpiYear):
+    def __init__(self, page):
         self.page = page
-        self.kpiname = readCurrentKpiNameJson
-        self.kpiYear = kpiYear
+        self.kpiname = readCurrentKpiName()
+        self.kpiYear = readKpiYear()
 
     def navigateToPmsPlanning(self):
         expect(self.page.get_by_text("PMS (B21-F14)")).to_be_visible()
@@ -24,38 +24,8 @@ class IndividualPMS(Dashboard):
         self.page.get_by_text(self.kpiYear).click()
         time.sleep(0.5)
 
-        #resetting total default slots
-        writeTotalSlots(5)
-
     def configureKPISlots(self):
         self.page.get_by_label("config slot").click()
-
-        # if readAddSlots():
-        #     for i in range(1, readAddSlots()+1):
-        #         self.page.get_by_role("button", name="Add").click()
-
-        # if readDeleteSlots():
-        #     for i in range(1, readDeleteSlots()+1):
-        #         self.page.get_by_role("button").nth(2).click()
-    
-        #slotFields = "#mat-dialog-0 > app-slot-configure > div.mat-dialog-content.flex.flex-col.gap-3.ps.ps--active-y > form > div"
-        # slotFields = "app-slot-configure > div.mat-dialog-content.flex.flex-col.gap-3.ps.ps--active-y > form > div"
-        # totalSlots = self.page.locator(slotFields).count()
-
-        # if totalSlots == 0:
-        #     slotFields = "app-slot-configure > div.mat-dialog-content.flex.flex-col.gap-3.ps > form > div"
-        #     totalSlots = self.page.locator(slotFields).count()
-        
-        # writeTotalSlots(totalSlots)
-        # print(totalSlots)
-        # percentage, extra = calculatePercentage()
-
-        # for i in range(1, totalSlots+1):
-        #     self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *").click()
-        #     self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *").fill(str(percentage))
-        #     if i == totalSlots:
-        #         self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *").click()
-        #         self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *").fill(str(percentage+extra))
 
         for i in range(1, 6):
             kpi = self.page.get_by_label(f"{self.kpiname} {self.kpiYear} 1.{i} Weightage *")
@@ -78,7 +48,7 @@ class IndividualPMS(Dashboard):
             kpiButton = self.page.get_by_role("button").filter(has_text=re.compile(fr"{self.kpiname}"))
         kpiButton.click()
 
-    def fillupSubKPIs(self, count, start, stop):
+    def fillupSubKPIs(self, start, stop):
         #print(count, start, stop)
         # self.page.get_by_text("Close").click()
 
@@ -92,11 +62,11 @@ class IndividualPMS(Dashboard):
 
             subkpi.click()
             self.page.get_by_role("button", name="Create KPI").click()
-            self.page.get_by_label("KPI Name *").fill(f"Sub {self.kpiname} {count}_{kpi} (Automated)")
+            self.page.get_by_label("KPI Name *").fill(f"Sub {self.kpiname} {count()}_{kpi} (Automated)")
             self.page.get_by_label("KPI Definition *").click()
             self.page.get_by_placeholder("Write Your Kpi Definition").fill(f"Sub {self.kpiname} {kpi}")
 
-            var = 80
+            var = random.randint(50,80)
             for l in range(1,6):
                 self.page.get_by_label(f"L{l} *").click()
                 self.page.get_by_label(f"L{l} *").fill(f"{var}")
@@ -120,21 +90,21 @@ class IndividualPMS(Dashboard):
         self.confirmSuccessPopup()
 
 class PMSApproval(Dashboard):
-    def __init__(self, page, readCurrentKpiNameJson, kpiYear):
+    def __init__(self, page):
         self.page = page
-        self.kpiname = readCurrentKpiNameJson
-        self.kpiYear = kpiYear
+        self.kpiname = readCurrentKpiName()
+        self.kpiYear = readKpiYear()
 
     def navigateToManagerDashboard(self):
         self.page.get_by_text("Manager", exact=True).click()
         self.page.get_by_text("Manager Dashboard", exact=True).click()
 
-    def navigateToPmsApproval(self, readEmployeeName):
+    def navigateToPmsApproval(self):
         self.page.get_by_text("Manage PMS").click()
         self.page.get_by_role("link", name="PMS Planning Approval").click()
         self.page.get_by_label("2025").locator("div").first.click()
         self.page.get_by_text(f"{self.kpiYear}").click()
-        self.page.get_by_role("cell").filter(has_text=re.compile(fr"{readEmployeeName}")).click()
+        self.page.get_by_role("cell").filter(has_text=re.compile(fr"{readEmployeeName()}")).click()
     
     def revertKPI(self, action="Revert"):
         self.page.get_by_role("button", name="Accept/Revert").click()
@@ -182,19 +152,20 @@ class PMSApproval(Dashboard):
         kpi.click()
         self.page.locator(".seconddiv > div > button").first.click()
         self.page.get_by_label("L2 *").click()
-        self.page.get_by_label("L2 *").fill("88")
+        L2 = self.page.get_by_label("L2 *").input_value()
+        self.page.get_by_label("L2 *").fill(str(int(L2)+3))
         self.page.get_by_label("L4 *").click()
-        self.page.get_by_label("L4 *").fill("97")
+        L4 = self.page.get_by_label("L4 *").input_value()
+        self.page.get_by_label("L4 *").fill(str(int(L4)+3))
         self.page.get_by_text("Cancel Save").click()
         self.page.get_by_role("button", name="Save").click()
         self.page.get_by_role("button", name="Ok").click()
 
-
 class PMSSelfEvaluation(Dashboard):
-    def __init__(self, page, readCurrentKpiNameJson, kpiYear):
+    def __init__(self, page):
         self.page = page
-        self.kpiname = readCurrentKpiNameJson
-        self.kpiYear = kpiYear
+        self.kpiname = readCurrentKpiName()
+        self.kpiYear = readKpiYear()
 
     def navigateToPmsSelfEvaluation(self):
         expect(self.page.get_by_text("PMS (B21-F14)")).to_be_visible()
@@ -204,7 +175,6 @@ class PMSSelfEvaluation(Dashboard):
 
     def enterIndividualAchievement(self):
         expect(self.page.get_by_label("Individual Achievement *")).to_be_visible()
-        # val =  "body > app-root > layout > classic-layout > div > div.flex.flex-col.flex-auto > app-ess-pms-evaluation > div > div > div > div:nth-child(2) > div > div.seconddiv-ev.min-w-\[328px\].min-h-\[calc\(100vh-150px\)\] > div.p-1.pr-2.ng-star-inserted > app-pms-dtog-slot-view > div:nth-child(9) > div:nth-child(1)"
         val = "div.p-1.pr-2.ng-star-inserted > app-pms-dtog-slot-view > div:nth-child(9) > div:nth-child(1)"
         expect(self.page.locator(val)).to_be_visible()
         self.page.get_by_label("Individual Achievement *").click()
@@ -214,18 +184,6 @@ class PMSSelfEvaluation(Dashboard):
 
     def fillupKpiEvals(self):
         for kpi in range(1, 6):
-            
-            # kpiButton = self.page.get_by_role("button").filter(has_text=re.compile(fr"{self.kpiname} {self.kpiYear}"))
-            # subkpi = kpiButton.locator("div").filter(has_text=re.compile(f"{self.kpiname} {self.kpiYear} 1.{kpi}" or f"{self.kpiname} 1.{kpi}")).nth(1)
-            # print(subkpi)
-
-            # subkpi.click()
-
-            # regex_pattern = fr"{re.escape(self.kpiname)}(?: {re.escape(self.kpiYear)})? 1\.{kpi}"
-            # self.page.get_by_role("label").filter(has_text=re.compile(regex_pattern)).click()
-            
-            # self.page.get_by_role("label").filter(
-            # has_text=re.compile(fr"{self.kpiname} {re.escape(self.kpiYear)}? 1\.{kpi}")).click()
 
             subkpi = self.page.get_by_text(f"{self.kpiname} {self.kpiYear} 1.{kpi}")
             if subkpi.is_visible():
@@ -246,15 +204,15 @@ class PMSSelfEvaluation(Dashboard):
         self.confirmSuccessPopup()
 
 class PMSEvaluationApproval(Dashboard):
-    def __init__(self, page, readCurrentKpiNameJson, kpiYear):
+    def __init__(self, page):
         self.page = page
-        self.kpiname = readCurrentKpiNameJson
-        self.kpiYear = kpiYear
+        self.kpiname = readCurrentKpiName()
+        self.kpiYear = readKpiYear()
 
-    def navigateToPmsEvaluationApproval(self, readEmployeeName):
+    def navigateToPmsEvaluationApproval(self):
         self.page.get_by_text("Manage PMS").click()
         self.page.get_by_role("link", name="PMS Evaluation Approval").click()
-        self.page.get_by_role("cell").filter(has_text=re.compile(fr"{readEmployeeName}")).click()
+        self.page.get_by_role("cell").filter(has_text=re.compile(fr"{readEmployeeName()}")).click()
 
     def evaluateEvaluation(self):
         for kpi in range(1, 6):
