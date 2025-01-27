@@ -7,7 +7,7 @@ def test_loginAsEmployee(page):
 
 def test_navigateToPmsEvaluation(page):
     eval = PMSSelfEvaluation(page)
-    # page.pause()
+    page.pause()
     eval.navigateToPmsSelfEvaluation()
     pms = IndividualPMS(page)
     pms.navigateToKPI()

@@ -217,6 +217,9 @@ class PMSEvaluationApproval(Dashboard):
     def evaluateEvaluation(self):
         for kpi in range(1, 6):
             subkpi = self.page.get_by_text(f"{self.kpiname} {self.kpiYear} 1.{kpi}")
+            self.page.clock.fast_forward("00:15")
+
+            
             if subkpi.is_visible():
                 subkpi = subkpi
             else:
@@ -248,14 +251,16 @@ class PMSEvaluationApproval(Dashboard):
 
     def fillupIndividualDevelopmentPlan(self):
         self.page.get_by_text("Individual Development Plan").click()
-        self.page.get_by_text("Development Plan [T&D]: Manager").click()
-
-        self.page.get_by_role("tab", name="Development Plan [T&D]: Manager").locator("div").click()
-        expect(self.page.locator("mat-radio-button").filter(has_text="Yes")).to_be_visible()
-        self.page.locator("mat-radio-button").filter(has_text="Yes").click()
+        time.sleep(0.5)
+        self.page.get_by_role("tab", name="Development Plan [T&D]: Manager").click()
+        time.sleep(0.5)
+        # div = self.page.get_by_role("tab", name="Development Plan [T&D]: Manager").locator("div")
+        yesButton = self.page.locator("mat-radio-button").filter(has_text="Yes")
+        time.sleep(0.5)
+        yesButton.click()
 
         self.page.get_by_label("Do you recommend any").click()
-        self.page.get_by_placeholder("The above will be used to").fill("/no")
+        self.page.get_by_placeholder("The above will be used to").fill("No")
         self.page.get_by_role("button", name="Save").click()
         self.confirmSuccessPopup()
 
