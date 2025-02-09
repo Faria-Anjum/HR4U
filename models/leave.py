@@ -2,7 +2,8 @@
 # add weekend check for automatic leave date selection
 
 from models.landing import Dashboard
-from models.writeToJson import writeRemainingLeave, writeLeaveDuration, updateRemainingLeave
+from files.readFromJson import firstLMLogin, readUpdatedLeave
+from files.writeToJson import writeRemainingLeave, writeLeaveDuration, updateRemainingLeave
 from playwright.sync_api import expect
 import re, time
 
@@ -33,12 +34,12 @@ class LeaveRequest(Dashboard):
         rem = self.page.locator("#automat_leave_form div").get_by_text("You have").inner_text()
         getRemaining(rem)
 
-    def selectDate(self, today, three):
+    def selectDate(self, tomorrow, threeDays):
         self.page.get_by_label("Start Date *").click()
         self.page.locator("#automat_start_date").get_by_label("Open calendar").click()
-        self.page.get_by_label(today, exact=True).click()
+        self.page.get_by_label(tomorrow, exact=True).click()
         self.page.locator("#automat_end_date").get_by_label("Open calendar").click()
-        self.page.get_by_label(three, exact=True).click()
+        self.page.get_by_label(threeDays, exact=True).click()
 
     def getDuration(self):
         time.sleep(0.25)
@@ -55,10 +56,10 @@ class LeaveRequest(Dashboard):
 
 
 class AcceptRequest(Dashboard):
-    def __init__(self, page, managerLogin):
+    def __init__(self, page):
         self.page = page
         self.url = "https://test-pub-hris.robi.com.bd/"
-        self.email, self.password, self.name = managerLogin
+        self.email, self.password, self.name = firstLMLogin()
 
     def navigateToAllPendingRequests(self):
         # uncomment if logging in to manager defaults to employee dashboard
@@ -86,11 +87,11 @@ class VerifyAccepted(LeaveRequest):
     def __init__(self, page):
         self.page = page
 
-    def checkRemaining(self, readUpdatedLeave):
+    def checkRemaining(self):
         # ensure accepted leave has been deducted
         self.page.get_by_text("More").click()
         self.page.get_by_role("menuitem", name="Leave Balance").click()
-        expect(self.page.locator("#automat_leave_table")).to_contain_text("Remaining " + str(readUpdatedLeave))
+        expect(self.page.locator("#automat_leave_table")).to_contain_text("Remaining " + str(readUpdatedLeave()))
         self.page.get_by_role("button").click()
 
 class Withdraw(LeaveRequest):

@@ -1,38 +1,40 @@
 from models.landing import Dashboard
 from models.profile import ProfilePage, TrainingPage
-import pytest
 
 def test_navigateToLogin(page):
-    #page.pause()
+    # page.pause()
     '''User can navigate to login'''
     dash = Dashboard(page)
     dash.navigate()
     
-def test_enterEmployeeCredentials(page, employeeLogin):
+def test_enterEmployeeCredentials(page):
     '''User can login'''
-    login = ProfilePage(page, employeeLogin)
+    login = ProfilePage(page)
     login.loginUser()
     login.loginPass()
     login.clickLogIn()
 
-def test_navigateToProfile(page, employeeLogin):
-    profile = ProfilePage(page, employeeLogin)
+def test_navigateToProfile(page):
+    profile = ProfilePage(page)
     profile.navigateToProfilePage()
     profile.verifyProfilePage()
 
-def test_addTraining(page, readCertificateInfo, employeeLogin):
-    profile = ProfilePage(page, employeeLogin)
+def test_addTraining(page, effectiveDate, expDate):
+    profile = ProfilePage(page)
     profile.editProfile()
-    training = TrainingPage(page, readCertificateInfo)
+    training = TrainingPage(page, effectiveDate, expDate)
     training.addTraining()
     training.confirmSuccessPopup()
 
-def test_confirmEditedTraining(page, readCertificateInfo, readTrainingUrl):
-    training = TrainingPage(page, readCertificateInfo)
-    training.confirmTrainingAdd(readTrainingUrl)
+def test_confirmEditedTraining(page, effectiveDate, expDate):
+    training = TrainingPage(page, effectiveDate, expDate)
+    training.confirmTrainingAdd()
 
-def test_deleteTraining(page, readCertificateInfo, employeeLogin):
-    training = TrainingPage(page, readCertificateInfo)
-    profile = ProfilePage(page, employeeLogin)
+def test_deleteTraining(page, effectiveDate, expDate):
+    training = TrainingPage(page, effectiveDate, expDate)
+    profile = ProfilePage(page)
     profile.editProfile()
     training.deleteTraining()
+
+def test_closeBrowser(page):
+    page.close()

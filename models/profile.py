@@ -1,12 +1,13 @@
 from models.landing import Dashboard
-from models.writeToJson import writeTrainingTestCounter
+from files.readFromJson import employeeLogin, readCertificateInfo, readTrainingUrl
+from files.writeToJson import writeTrainingTestCount
 from playwright.sync_api import expect
 import re, time
 
 class ProfilePage(Dashboard):
-    def __init__(self, page, employeeLogin):
+    def __init__(self, page):
         self.page = page
-        self.email, self.password, self.name = employeeLogin
+        self.email, self.password, self.name = employeeLogin()
 
     def navigateToProfilePage(self):
         expect(self.page.locator("user div").first).to_be_visible()
@@ -30,9 +31,9 @@ class ProfilePage(Dashboard):
 
 
 class TrainingPage(Dashboard):
-    def __init__(self, page, readCertificateInfo):
+    def __init__(self, page, effectiveDate, expDate):
         self.page = page
-        self.certificate, self.institution, self.effective, self.expDay, self.expMonth, self.expYear, self.skill = readCertificateInfo
+        self.certificate, self.institution, self.effective, self.expDay, self.expMonth, self.expYear, self.skill = readCertificateInfo(effectiveDate, expDate)
 
     def addTraining(self):
         self.page.get_by_role("link", name="Training Info").click()
@@ -63,10 +64,10 @@ class TrainingPage(Dashboard):
         # self.page.get_by_role("button", name="Add Trainings").click()
 
         self.page.get_by_role("button", name="Save & Next").click()
-        writeTrainingTestCounter()
+        writeTrainingTestCount(1)
         
-    def confirmTrainingAdd(self, readTrainingUrl):
-        self.page.goto(readTrainingUrl)
+    def confirmTrainingAdd(self):
+        self.page.goto(readTrainingUrl())
         # expect(self.page.get_by_role("button", name="View Profile")).to_be_visible()
         # self.page.get_by_role("button", name="View Profile").click()
         # global trainingDiv

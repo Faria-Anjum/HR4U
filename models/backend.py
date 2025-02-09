@@ -1,11 +1,13 @@
 from models.landing import Dashboard
+from files.readFromJson import adminLogin, readEmployeeName
 from playwright.sync_api import expect
+import time
 
 class Admin(Dashboard):
-    def __init__(self, page, adminLogin):
+    def __init__(self, page):
         self.page = page
         self.url = 'https://test-hris.robi.com.bd'
-        self.user, self.password, self.employeeName = adminLogin
+        self.user, self.password = adminLogin()
 
     def clickAccept(self):
         self.page.get_by_role("button", name="Accept").click()
@@ -37,14 +39,15 @@ class Admin(Dashboard):
         self.page.get_by_role("option", name="2024").click()
 
         self.page.get_by_label("Select Employee").locator("span").click()
-        self.page.get_by_placeholder("Search here").fill(self.employeeName)
-        self.page.get_by_role("option", name=self.employeeName).locator("span").click()
+        self.page.get_by_placeholder("Search here").fill(readEmployeeName())
+        self.page.get_by_role("option", name=readEmployeeName()).locator("span").click()
         self.page.get_by_role("heading", name="Assign New Profile").click(force=True)
 
         self.page.get_by_label("Select Group").locator("span").click()
         self.page.get_by_text("Individual KPI (weightage:").click()
-
+        time.sleep(0.25)
         self.page.locator("mat-label").filter(has_text="Add Performance Profile Template").click(force=True)
+        
         self.page.get_by_role("option", name="Core Value Assessment (").click()
         self.page.get_by_role("heading", name="Assign New Profile").click(force=True)
 
@@ -64,6 +67,10 @@ class Admin(Dashboard):
 
     def clickSaveButton(self):
         self.page.get_by_role("button", name="Save").click()
+        time.sleep(0.5)
+        self.page.get_by_role("button", name="Close").click()
+
+
 
 #     self.page.locator(".mat-form-field-infix").first.click()
 #     self.page.get_by_placeholder("Search here").fill("Salman")
