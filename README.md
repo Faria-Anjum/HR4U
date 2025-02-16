@@ -16,6 +16,17 @@
 + Requesting withdrawal of approved leave through employee
 + Accepting leave withdrawal through manager
 
+#### Profile
++ Add training details
++ Claim handset
+
+#### PMS
++ Request KPI through employee
++ Accept KPI through manager
++ Create Core Value Assessment from backend
++ Submit self-evaluation of KPI through employee
++ Accept and validate evaluation through manager
+
 ## Setup
 #### In a terminal, navigate to the root folder and enter this command to install all requirements:
 ```
@@ -25,30 +36,6 @@ pip install -r requirements.txt
 ```
 pytest
 ```
-
-## Directory
-
-HR4U  
-│   conftest.py  
-│   directory.txt  
-│   html-test-report.html  
-│   pytest.ini  
-│   requirements.txt  
-│  
-├───files  
-│       data.json  
-│  
-├───models  
-│       landing.py  
-│       leave.py  
-│       pms.py  
-│       writeToJson.py  
-│  
-├───tests  
-│      test_01_leave.py  
-│      test_02_withdraw.py  
-│      test_03_pms.py  
-│      __init__.py
 
 ## Important files:
 
@@ -73,10 +60,13 @@ runtime configuration file, accepts commands for:
 #### /files/data.json:
 contains data to write/read/edit while tests run for all modules
 
-#### /models/writeToJson.py:
+#### /files/readFromJson.py:
+contains functions to read from Json
+
+#### /files/writeToJson.py:
 contains functions to write to Json
 
-#### /tests/test_01_leave.py:
+#### /tests/tests_01_landing/test_a_profile.py:
 contains the login functions for employee and manager, imported in later test files
 
 #### /tests/__init__.py:
